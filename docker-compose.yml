@@ -1,0 +1,26 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    container_name: auto-controle-api
+    ports:
+      - "5000:5000"
+    volumes:
+      - "./api:/usr/auto-controle/api"
+      - "./api/node_modules:/usr/auto-controle/api/node_modules"
+    networks:
+      - auto-controle-network
+  app:
+    build: ./app
+    container_name: auto-controle-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./app:/usr/auto-controle/app"
+      - "./app/node_modules:/usr/auto-controle/app/node_modules"
+    networks:
+      - auto-controle-network
+
+networks:
+  auto-controle-network:
+    driver: bridge
