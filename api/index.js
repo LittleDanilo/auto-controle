@@ -15,6 +15,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use('/user', require('./src/Routes/user'));
+app.use('/accounts', require('./src/Routes/accounts'));
 
 app.listen(process.env.PORT, () => {
     console.log('server online');
