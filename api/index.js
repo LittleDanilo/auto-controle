@@ -14,9 +14,11 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.use('/user', require('./src/Routes/user'));
+// routes
+app.use('/users', require('./src/Routes/users'));
 app.use('/accounts', require('./src/Routes/accounts'));
 
+// server
 app.listen(process.env.PORT, () => {
     console.log('server online');
 });
