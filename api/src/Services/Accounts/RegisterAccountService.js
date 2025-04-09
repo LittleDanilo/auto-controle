@@ -1,7 +1,7 @@
 const Account = require('../../Models/Accounts');
 
 class RegisterAccountService {
-    static async RegisterAccountService(name, description, type) {
+    static async execute(name, description, type) {
         try {
             const account = await Account.create({
                 name: name,
