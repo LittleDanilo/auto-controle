@@ -1,0 +1,17 @@
+const Accounts = require('../../Models/Accounts');
+
+class UpdateAccountService {
+    static async execute({fields}, id) {
+        try {
+            console.log(fields);
+            
+            const account = await Accounts.update(fields, {where: {id_conta: id}});
+            return account;
+        } catch (err) {
+            console.log(err);
+            throw new Error(err.message || "Internal error.");
+        }
+    }
+}
+
+module.exports = UpdateAccountService;
