@@ -1,0 +1,31 @@
+nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 50px;
+  }
+  
+  nav li {
+    padding: 0 10px;
+    position: relative;
+  }
+  
+  nav li + li::before {
+    content: "|";
+    position: absolute;
+    left: 0;
+    color: #ccc;
+    padding-right: 10px;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: #d3d3d3;
+    font-weight: bold;
+  }
+  
+  nav a:hover {
+    color: #007bff;
+  }
+  

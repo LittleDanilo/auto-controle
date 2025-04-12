@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    width: 100vw;
+    background: linear-gradient(180deg, #1e1c5d 0%, rgba(30, 29, 79, 0.8) 100%);
+    
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 50px ;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #323693b6;
+    max-width: 50%;
+    width: 600px;
+    margin-bottom: 20px;
+    color: white;
+
+    & button {
+        border-radius: 30px;
+        background-color: #5351d7;
+        height: 40px;
+        border:none;
+        font-weight: bold;
+        cursor: pointer;
+        color: rgb(255, 255, 255);
+        padding: 10px;
+        margin-right: 20px;
+    }
+
+    & button hover {
+        opacity: 0.8;
+    }
+    
+    & input, textarea, select {
+        border: 1px solid #48456c;
+        border-radius: 10px;
+        height: 40px;
+        background-color: #363653;
+        color: white;
+        font-size: 16px;
+        padding-left: 10px;
+        outline: none;
+    }
+}
+
+h1 {
+    color: white;
+}
+
+.trash {
+    color: rgb(120, 24, 24);
+}
+
+.trash :hover {
+    color: rgb(194, 32, 32);
+}
+
+/* Tabela */
+table {
+    border-collapse: collapse; /* Elimina espaçamento entre células */
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 50px;
+  }
+  
+  /* Cabeçalho da tabela */
+  th {
+    background-color: #245588;
+    color: white;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #0e447f; /* Borda mais forte */
+  }
+  
+  /* Células da tabela */
+  td {
+    padding: 12px 16px;
+    border: 1px solid #ddd; /* Borda mais clara */
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Linha alternada (zebra) para facilitar leitura */
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+  
+  /* Hover nas linhas para destacar ao passar o mouse */
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Espaçamento entre a tabela e o restante do conteúdo */
+  table {
+    margin-top: 20px;
+  }
+  
+  /* Valor com destaque em dinheiro */
+  td:nth-child(4) {
+    color: #24387a;
+    font-weight: bold;
+  }
+  
+  td:nth-child(5) {
+    font-style: italic;
+  }
+
+
+  
