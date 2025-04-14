@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 // routes
 app.use('/users', require('./src/Routes/users'));
 app.use('/accounts', require('./src/Routes/accounts'));
+app.use('/transactions', require('./src/Routes/transaction'));
 
 // server
 app.listen(process.env.PORT, () => {
