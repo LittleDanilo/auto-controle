@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:lts-bullseye
 
 WORKDIR /usr/auto-controle/app
 COPY ./package*.json ./
