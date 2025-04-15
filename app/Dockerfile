@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:lts-bullseye
 
 WORKDIR /usr/auto-controle/app
 COPY ./package*.json ./
@@ -6,5 +6,5 @@ COPY ./package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 3000
-CMD [ "npm", "run", "dev" ]
+EXPOSE 5173
+CMD [ "npm", "run", "dev", "--","--host" ]
