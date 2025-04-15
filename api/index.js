@@ -9,6 +9,9 @@ db.authenticate()
     .then(console.log("conexão bem-sucedida"))
     .catch((err) => {console.log(err)});
 
+// Descomente e execute quando quiser criar as tabelas do seu banco de dados.
+// db.sync({force:true})
+
 // server config
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
