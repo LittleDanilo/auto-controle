@@ -1,4 +1,4 @@
-FROM node:22.14
+FROM node:latest
 
 WORKDIR /usr/auto-controle/api
 COPY ./package*.json ./
