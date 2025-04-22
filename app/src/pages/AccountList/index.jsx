@@ -1,8 +1,10 @@
-import './style.css'
 import Menu from '../../components/Menu'
-import { MdDelete } from 'react-icons/md'
+import { MdDelete, MdAdd } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom';
 
 function AccountList() {
+
+  const navigate = useNavigate();
 
   const contas = [
     {
@@ -95,11 +97,26 @@ function AccountList() {
             </thead>
             <tbody>
               {contas.map((c) => (
-                <tr key={c.id_conta}>
+                <tr key={c.id_conta}onClick={() => navigate('/contas', { state: { contaRecebida: c } })} style={{ cursor: 'pointer' }}>
                   <td>{c.nome}</td>
                   <td>{c.tipo}</td>
                   <td>{c.descricao}</td>
-                  <td><MdDelete size={28} className="trash" /></td>
+                  <td
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (c.status === 'Suspensa') {
+                        console.log('Essa cação será reativada:', c.id_conta);
+                      } else {
+                        console.log('Deletar cação:', c.id_conta);
+                      }
+                    }}
+                  >
+                    {c.status === 'Suspensa' ? (
+                      <MdAdd size={28} className="plus" />
+                    ) : (
+                      <MdDelete size={28} className="trash" />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
