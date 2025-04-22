@@ -1,67 +1,23 @@
 import Menu from '../../components/Menu'
 import { MdDelete, MdAdd } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import api from '../../services/api'
 
 function AccountList() {
 
   const navigate = useNavigate();
 
-  const contas = [
-    {
-      id_conta: 1,
-      nome: "Conta Corrente Interna 1",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:00:00",
-      updated_at: "2025-04-10T10:00:00"
-    },
-    {
-      id_conta: 2,
-      nome: "Conta Corrente Interna 2",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:30:00",
-      updated_at: "2025-04-10T10:30:00"
-    },
-    {
-      id_conta: 3,
-      nome: "Conta Corrente Interna 3",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Suspensa",
-      created_at: "2025-04-11T12:00:00",
-      updated_at: "2025-04-11T12:00:00"
-    },
-    {
-      id_conta: 4,
-      nome: "Conta Corrente Externa 1",
-      descricao: "Conta externa utilizada para pagamento de serviços",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T09:00:00",
-      updated_at: "2025-04-10T09:00:00"
-    },
-    {
-      id_conta: 5,
-      nome: "Conta Corrente Externa 2",
-      descricao: "Conta externa utilizada para pagamento de fornecedores",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T11:00:00",
-      updated_at: "2025-04-10T11:00:00"
-    },
-    {
-      id_conta: 6,
-      nome: "Conta Corrente Externa 3",
-      descricao: "Conta externa de operações bancárias",
-      tipo: "Externa",
-      status: "Inativa",
-      created_at: "2025-04-10T14:00:00",
-      updated_at: "2025-04-10T14:00:00"
-    }
-  ];
+  const [contas, setContas] = useState({});
+
+  async function getAccounts(){
+    const accountsFromApi = await api.post('/accounts/list')
+    setContas(accountsFromApi.data.result)
+  }
+
+  useEffect(() =>{
+    getAccounts()
+  }, [])
   
   return (
     <div className='container'>
@@ -83,6 +39,15 @@ function AccountList() {
               <input type="text" name="vanomelor" placeholder="Nome" />
             </label>
 
+            <label>
+              Status:
+              <select name="status">
+                <option value="Ativa">Ativa</option>
+                <option value="Inativa">Inativa</option>
+                <option value="Suspensa">Suspensa</option>
+              </select>
+            </label>
+
             <button type="submit">Filtrar</button>
           </form>
 
@@ -96,18 +61,18 @@ function AccountList() {
               </tr>
             </thead>
             <tbody>
-              {contas.map((c) => (
-                <tr key={c.id_conta}onClick={() => navigate('/contas', { state: { contaRecebida: c } })} style={{ cursor: 'pointer' }}>
-                  <td>{c.nome}</td>
-                  <td>{c.tipo}</td>
-                  <td>{c.descricao}</td>
+              {Array.isArray(contas) && contas.map((c) => (
+                <tr key={c.id}onClick={() => navigate('/contas', { state: { contaRecebida: c } })} style={{ cursor: 'pointer' }}>
+                  <td>{c.name}</td>
+                  <td>{c.type}</td>
+                  <td>{c.description}</td>
                   <td
                     onClick={(e) => {
                       e.stopPropagation();
                       if (c.status === 'Suspensa') {
-                        console.log('Essa cação será reativada:', c.id_conta);
+                        console.log('Essa cação será reativada:', c.id);
                       } else {
-                        console.log('Deletar cação:', c.id_conta);
+                        console.log('Deletar cação:', c.id);
                       }
                     }}
                   >

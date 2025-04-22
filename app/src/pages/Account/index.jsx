@@ -1,11 +1,16 @@
 import Menu from '../../components/Menu'
 import { useLocation } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import api from '../../services/api'
 
 function Account() {
 
   const location = useLocation();
     const { contaRecebida } = location.state || {};
+
+    const inputName = useRef();
+    const inputType = useRef();
+    const inputDesc = useRef();
     
     const [desabilitado, setDesabilitado] = useState(!!contaRecebida);
     const [salvarHabilitado, setSalvarHabilitado] = useState(false);
@@ -13,9 +18,9 @@ function Account() {
     const [cancelarHabilitado, setCancelarHabilitado] = useState(false);
   
     const valorOriginal = {
-      nome: contaRecebida?.nome || '',
-      tipo: contaRecebida?.tipo || 'Interna',
-      descricao: contaRecebida?.descricao || '',
+      nome: contaRecebida?.name || '',
+      tipo: contaRecebida?.type || 'Interna',
+      descricao: contaRecebida?.description || '',
       status: contaRecebida?.status || 'Ativa',
     };
   
@@ -26,6 +31,12 @@ function Account() {
         setForm({ ...valorOriginal });
       }
     }, [location.state]);
+
+    useEffect(() => {
+      const isEdicao = !!contaRecebida;
+      setDesabilitado(isEdicao);
+    }, [contaRecebida]);
+    
   
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -56,6 +67,22 @@ function Account() {
       }
     };
 
+    async function createAccount(){
+      let rawInputs = {
+        name: inputName.current.value,
+        type: inputType.current.value,
+        description: inputDesc.current.value
+      }
+      if (rawInputs.name == '') return alert("O nome deve ser preenchido")
+      const inputs = Object.fromEntries(
+        Object.entries(rawInputs).filter(([_, v]) => v !== '')
+      );
+      const accountsFromApi = await api.post('/accounts/register', inputs)
+      if (accountsFromApi.data.status == 200) return alert("Conta criada com sucesso, confia");
+      alert("Deu ruim :("); 
+    }
+
+    console.log(contaRecebida);
 
   return (
     <div className='container'>
@@ -65,32 +92,27 @@ function Account() {
 
         <label>
           Nome:
-          <input type="text" name="nome" placeholder="Nome" value={form.nome} onChange={handleChange} disabled={desabilitado}/>
+          <input
+            type="text" name="nome" placeholder="Nome" 
+            value={form.nome} onChange={handleChange} disabled={desabilitado} ref={inputName}/>
         </label>
 
         <label>
           Tipo:
-          <select name="tipo" value={form.tipo} onChange={handleChange} disabled={desabilitado}>
-            <option value="">Interna</option>
-            <option value="">Externa</option>
+          <select name="tipo" value={form.tipo} onChange={handleChange} disabled={desabilitado} ref={inputType}>
+            <option value="Interna">Interna</option>
+            <option value="Externa">Externa</option>
           </select>
         </label>
 
         <label>Descricao:</label>
-          <textarea id="descricao" name="descricao" rows="4" cols="50" value={form.descricao} onChange={handleChange} disabled={desabilitado}></textarea>
-
-        <label>
-          Status:
-          <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>
-            <option value="Ativa">Ativa</option>
-            <option value="Inativa">Inativa</option>
-            <option value="Suspensa">Suspensa</option>
-          </select>
-        </label>
+        <textarea id="descricao" name="descricao" rows="4" cols="50"
+          value={form.descricao} onChange={handleChange} disabled={desabilitado} ref={inputDesc}>
+        </textarea>
 
           <p>
           {!contaRecebida ? (
-            <button type="button" onClick={handleSubmit}>Criar</button>
+            <button type="button" onClick={createAccount}>Criar</button>
           ) : (
             <>
               <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>

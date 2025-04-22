@@ -3,7 +3,7 @@ const Accounts = require('../../Models/Accounts');
 class UpdateAccountService {
     static async execute({fields}, id) {
         try {
-            const account = await Accounts.update(fields, {where: {id_conta: id}});
+            const account = await Accounts.update(fields, {where: {id: id}});
             return account;
         } catch (err) {
             console.log(err);
