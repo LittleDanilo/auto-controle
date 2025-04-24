@@ -63,7 +63,7 @@ function AccountList() {
       <Menu />
         
           <form className='container'>
-          <h1>Pagina de Lista de Contas</h1>
+          <h1>Listar de Contas</h1>
             <label>
               Tipo:
               <select name="type" onChange={handleChange}>
@@ -97,12 +97,16 @@ function AccountList() {
                 <th>Nome</th>
                 <th>Tipo</th>
                 <th>Descrição</th>
-                <th>Cancelar</th>
+                <th>Modificar</th>
               </tr>
             </thead>
             <tbody>
               {Array.isArray(contas) && contas.map((c) => (
-                <tr key={c.id}onClick={() => navigate('/contas', { state: { contaRecebida: c } })} style={{ cursor: 'pointer' }}>
+                <tr 
+                  key={c.id}
+                  onClick={() => navigate('/contas', { state: { contaRecebida: c } })}
+                  style={{ cursor: 'pointer' }}
+                >
                   <td>{c.name}</td>
                   <td>{c.type}</td>
                   <td>{c.description}</td>

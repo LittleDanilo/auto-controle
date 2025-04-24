@@ -1,11 +1,13 @@
 import Menu from '../../components/Menu'
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import api from '../../services/api'
 
 function Transaction() {
 
   const location = useLocation();
   const { transacaoRecebida } = location.state || {};
+  const [transacaoAtual, setTransacaoAtual] = useState(transacaoRecebida);
   
   const [desabilitado, setDesabilitado] = useState(!!transacaoRecebida);
   const [salvarHabilitado, setSalvarHabilitado] = useState(false);
@@ -13,21 +15,44 @@ function Transaction() {
   const [cancelarHabilitado, setCancelarHabilitado] = useState(false);
 
   const valorOriginal = {
-    origem: transacaoRecebida?.conta_origem || '',
-    destino: transacaoRecebida?.conta_destino || '',
-    valor: transacaoRecebida?.valor || '',
-    data: transacaoRecebida?.data_transferencia?.slice(0, 10) || '',
-    descricao: transacaoRecebida?.descricao || '',
-    status: transacaoRecebida?.status || 'Concluida',
+    origin: transacaoAtual?.origin || '',
+    destiny: transacaoAtual?.destiny || '',
+    value: transacaoAtual?.value || '',
+    date: transacaoAtual?.date?.slice(0, 10) || '',
+    description: transacaoAtual?.description || '',
+    status: transacaoAtual?.status || 'Concluida',
   };
 
   const [form, setForm] = useState({ ...valorOriginal });
+  const [contas, setContas] = useState({});
+
+  async function getAccounts(){
+    const accountsFromApi = await api.post('/accounts/list')
+    setContas(accountsFromApi.data.result)
+  }
+
+  useEffect(() => {
+    getAccounts();
+  }, []);
 
   useEffect(() => {
     if (!transacaoRecebida) {
       setForm({ ...valorOriginal });
     }
   }, [location.state]);
+
+  useEffect(() => {
+      const isEdicao = !!transacaoRecebida;
+      if (isEdicao) return setDesabilitado(isEdicao);
+      setForm({
+        origin: '',
+        destiny: '',
+        value: '',
+        date: '',
+        description: '',
+        status: 'Concluida',
+      })
+    }, [transacaoRecebida]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,85 +74,51 @@ function Transaction() {
     setCancelarHabilitado(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (transacaoRecebida) {
-      console.log("Salvar edição:", form);
-    } else {
-      console.log("Criar nova transação:", form);
-    }
-  };
+  async function newTransaction(){
+    if (form.description == '' || form.value == '' || form.date == '') return alert("Preencha todos os campos.")
+    if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
+    const inputs = Object.fromEntries(
+      Object.entries(form).filter(([_, v]) => v !== '')
+    );
+    
+    const accountsFromApi = await api.post('/transactions/create', inputs)
+    if (accountsFromApi.data.status == 200) return alert("Transacao registrada com sucesso!");
+    alert("Erro ao registrar transacao."); 
+  }
 
+  async function updateTransaction(){
 
-  const contas = [
-    {
-      id_conta: 1,
-      nome: "Conta Corrente Interna 1",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:00:00",
-      updated_at: "2025-04-10T10:00:00"
-    },
-    {
-      id_conta: 2,
-      nome: "Conta Corrente Interna 2",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:30:00",
-      updated_at: "2025-04-10T10:30:00"
-    },
-    {
-      id_conta: 3,
-      nome: "Conta Corrente Interna 3",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Suspensa",
-      created_at: "2025-04-11T12:00:00",
-      updated_at: "2025-04-11T12:00:00"
-    },
-    {
-      id_conta: 4,
-      nome: "Conta Corrente Externa 1",
-      descricao: "Conta externa utilizada para pagamento de serviços",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T09:00:00",
-      updated_at: "2025-04-10T09:00:00"
-    },
-    {
-      id_conta: 5,
-      nome: "Conta Corrente Externa 2",
-      descricao: "Conta externa utilizada para pagamento de fornecedores",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T11:00:00",
-      updated_at: "2025-04-10T11:00:00"
-    },
-    {
-      id_conta: 6,
-      nome: "Conta Corrente Externa 3",
-      descricao: "Conta externa de operações bancárias",
-      tipo: "Externa",
-      status: "Inativa",
-      created_at: "2025-04-10T14:00:00",
-      updated_at: "2025-04-10T14:00:00"
+    if (form.descripton == '' || form.value == '') return alert("A descricao e o valor devem ser preenchidos.")
+    if (form.origin == form.destiny) return alert("As contas de origem e destino nao podem ser iguais.");
+    const accountsFromApi = await api.post('/transactions/update', {
+      id: transacaoRecebida.id,
+      fields: form
+    })
+    if (accountsFromApi.data.status == 200) {
+      const TransacaoAtualizada = { id: transacaoAtual.id, ...form };
+      setTransacaoAtual(TransacaoAtualizada);
+
+      setDesabilitado(true);
+      setSalvarHabilitado(false);
+      setEditarHabilitado(true);
+      setCancelarHabilitado(false);
+      return alert("Transacao editada com sucesso!");
     }
-  ];
+    alert("Erro ao editar transacao."); 
+  }
 
   return (
     <div className='container'>
       <Menu />
       <form>
-      <h1>Pagina de Transacoes</h1>
+      {!transacaoRecebida ? (<h1>Nova Transacao</h1>) : (<h1>Editar Transacao</h1>)}
         <label>
           Origem:
-          <select name="origem" value={form.origem} onChange={handleChange} disabled={desabilitado}>
-            <option value="">Todas</option>
-            {contas.map((conta) => (
-              <option key={conta.id_conta} value={conta.id_conta}>
-              {conta.nome}
+          <select name="origin" value={form.origin} onChange={handleChange} disabled={desabilitado}>
+            <option value="">Selecione uma conta</option>
+            {Array.isArray(contas) && contas.map((conta) => (
+              <option key={conta.id} value={conta.id}>
+              {conta.name}
               </option>
             ))}
           </select>
@@ -135,11 +126,11 @@ function Transaction() {
 
         <label>
           Destino:
-          <select name="destino" value={form.destino} onChange={handleChange} disabled={desabilitado}>
-            <option value="">Todas</option>
-            {contas.map((conta) => (
-              <option key={conta.id_conta} value={conta.id_conta}>
-                {conta.nome}
+          <select name="destiny" value={form.destiny} onChange={handleChange} disabled={desabilitado}>
+          <option value="">Selecione uma conta</option>
+            {Array.isArray(contas) && contas.map((conta) => (
+              <option key={conta.id} value={conta.id}>
+                {conta.name}
               </option>
             ))}
           </select>
@@ -147,16 +138,16 @@ function Transaction() {
 
         <label>
           Valor:
-          <input type="number" name="valor" placeholder="Valor" value={form.valor} onChange={handleChange} disabled={desabilitado}/>
+          <input type="number" name="value" placeholder="Valor" value={form.value} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>
           Data:
-          <input type="date" name="data" value={form.data} onChange={handleChange} disabled={desabilitado}/>
+          <input type="date" name="date" value={form.date} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>Descricao:</label>
-          <textarea id="descricao" name="descricao" rows="4" cols="50" value={form.descricao} onChange={handleChange} disabled={desabilitado}></textarea>
+          <textarea name="description" rows="4" cols="50" value={form.description} onChange={handleChange} disabled={desabilitado}></textarea>
         
         <label>
           Status:
@@ -169,13 +160,13 @@ function Transaction() {
                   
         <p>
           {!transacaoRecebida ? (
-            <button type="button" onClick={handleSubmit}>Criar</button>
+            <button type="button" onClick={newTransaction}>Criar</button>
           ) : (
             <>
               <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>
                 Editar
               </button>
-              <button type="button" onClick={handleSubmit} disabled={!salvarHabilitado}>
+              <button type="button" onClick={updateTransaction} disabled={!salvarHabilitado}>
                 Salvar
               </button>
               <button type="button" onClick={handleCancelar} disabled={!cancelarHabilitado}>

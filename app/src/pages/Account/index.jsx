@@ -8,7 +8,6 @@ function Account() {
   const location = useLocation();
   const { contaRecebida } = location.state || {};
   const [contaAtual, setContaAtual] = useState(contaRecebida);
-
     
     const [desabilitado, setDesabilitado] = useState(!!contaRecebida);
     const [salvarHabilitado, setSalvarHabilitado] = useState(false);
@@ -32,7 +31,12 @@ function Account() {
 
     useEffect(() => {
       const isEdicao = !!contaRecebida;
-      setDesabilitado(isEdicao);
+      if (isEdicao) return setDesabilitado(isEdicao);
+      setForm({
+        name: "",
+        type: "Interna",
+        description: "",
+      })
     }, [contaRecebida]);
     
   
@@ -91,8 +95,8 @@ function Account() {
     <div className='container'>
       <Menu />
       <form>
-      <h1>Pagina de Contas</h1>
-
+      {!contaRecebida ? (<h1>Nova Conta</h1>) : (<h1>Editar Conta</h1>)}
+      
         <label>
           Nome:
           <input
