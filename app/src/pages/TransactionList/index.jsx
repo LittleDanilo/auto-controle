@@ -127,39 +127,46 @@ function TransactionList() {
                 <th>Destino</th>
                 <th>Valor</th>
                 <th>Descrição</th>
+                <th>Status</th>
                 <th>Modificar</th>
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(transacoes) && transacoes.map((t) => (
-                <tr 
-                  key={t.id}
-                  onClick={() => navigate('/transacoes', { state: { transacaoRecebida: t } })}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td>{new Date(t.date).toLocaleDateString()}</td>
-                  <td>{t.origin}</td>
-                  <td>{t.destiny}</td>
-                  <td>R$ {parseFloat(t.value).toFixed(2)}</td>
-                  <td>{t.description}</td>
-                  <td
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (t.status === 'Cancelada') {
-                        reactivateTransaction(t.id);
-                      } else {
-                        cancelTransaction(t.id);
-                      }
-                    }}
+              {Array.isArray(transacoes) && transacoes.map((t) => {
+                const contaOrigem = contas.find((c) => c.id === t.origin);
+                const contaDestino = contas.find((c) => c.id === t.destiny);
+
+                return (
+                  <tr
+                    key={t.id}
+                    onClick={() => navigate('/transacoes', { state: { transacaoRecebida: t } })}
+                    style={{ cursor: 'pointer' }}
                   >
-                    {t.status === 'Cancelada' ? (
-                      <MdAdd size={28} className="plus" />
-                    ) : (
-                      <MdDelete size={28} className="trash" />
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    <td>{new Date(t.date).toLocaleDateString()}</td>
+                    <td>{contaOrigem?.name || 'Origem não encontrada'}</td>
+                    <td>{contaDestino?.name || 'Destino não encontrado'}</td>
+                    <td className='valor'>R$ {parseFloat(t.value).toFixed(2)}</td>
+                    <td>{t.description}</td>
+                    <td>{t.status}</td>
+                    <td
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (t.status === 'Cancelada') {
+                          reactivateTransaction(t.id);
+                        } else {
+                          cancelTransaction(t.id);
+                        }
+                      }}
+                    >
+                      {t.status === 'Cancelada' ? (
+                        <MdAdd size={28} className="plus" />
+                      ) : (
+                        <MdDelete size={28} className="trash" />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
     </div>

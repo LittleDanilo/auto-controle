@@ -132,13 +132,9 @@ table {
     margin-top: 20px;
   }
   
-  td:nth-child(4) {
+  .valor {
     color: #24387a;
     font-weight: bold;
-  }
-  
-  td:nth-child(5) {
-    font-style: italic;
   }
 
 

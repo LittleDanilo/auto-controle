@@ -97,6 +97,7 @@ function AccountList() {
                 <th>Nome</th>
                 <th>Tipo</th>
                 <th>Descrição</th>
+                <th>Status</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -110,6 +111,7 @@ function AccountList() {
                   <td>{c.name}</td>
                   <td>{c.type}</td>
                   <td>{c.description}</td>
+                  <td>{c.status}</td>
                   <td
                     onClick={(e) => {
                       e.stopPropagation();
