@@ -1,16 +1,14 @@
 import Menu from '../../components/Menu'
 import { useLocation } from 'react-router-dom';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../services/api'
 
 function Account() {
 
   const location = useLocation();
-    const { contaRecebida } = location.state || {};
+  const { contaRecebida } = location.state || {};
+  const [contaAtual, setContaAtual] = useState(contaRecebida);
 
-    const inputName = useRef();
-    const inputType = useRef();
-    const inputDesc = useRef();
     
     const [desabilitado, setDesabilitado] = useState(!!contaRecebida);
     const [salvarHabilitado, setSalvarHabilitado] = useState(false);
@@ -18,10 +16,10 @@ function Account() {
     const [cancelarHabilitado, setCancelarHabilitado] = useState(false);
   
     const valorOriginal = {
-      nome: contaRecebida?.name || '',
-      tipo: contaRecebida?.type || 'Interna',
-      descricao: contaRecebida?.description || '',
-      status: contaRecebida?.status || 'Ativa',
+      name: contaAtual?.name || '',
+      type: contaAtual?.type || 'Interna',
+      description: contaAtual?.description || '',
+      status: contaAtual?.status || 'Ativa',
     };
   
     const [form, setForm] = useState({ ...valorOriginal });
@@ -57,32 +55,37 @@ function Account() {
       setEditarHabilitado(true);
       setCancelarHabilitado(false);
     };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (contaRecebida) {
-        console.log("Salvar edição:", form);
-      } else {
-        console.log("Criar nova transação:", form);
-      }
-    };
 
     async function createAccount(){
-      let rawInputs = {
-        name: inputName.current.value,
-        type: inputType.current.value,
-        description: inputDesc.current.value
-      }
-      if (rawInputs.name == '') return alert("O nome deve ser preenchido")
+
+      if (form.name == '') return alert("O nome deve ser preenchido")
       const inputs = Object.fromEntries(
-        Object.entries(rawInputs).filter(([_, v]) => v !== '')
+        Object.entries(form).filter(([_, v]) => v !== '')
       );
       const accountsFromApi = await api.post('/accounts/register', inputs)
-      if (accountsFromApi.data.status == 200) return alert("Conta criada com sucesso, confia");
-      alert("Deu ruim :("); 
+      if (accountsFromApi.data.status == 200) return alert("Conta criada com sucesso!");
+      alert("Erro ao criar conta."); 
     }
 
-    console.log(contaRecebida);
+    async function updateAccount(){
+
+      if (form.name == '') return alert("O nome deve ser preenchido")
+      const accountsFromApi = await api.post('/accounts/update', {
+        id: contaRecebida.id,
+        fields: form
+      })
+      if (accountsFromApi.data.status == 200) {
+        const contaAtualizada = { id: contaAtual.id, ...form };
+        setContaAtual(contaAtualizada);
+
+        setDesabilitado(true);
+        setSalvarHabilitado(false);
+        setEditarHabilitado(true);
+        setCancelarHabilitado(false);
+        return alert("Conta editada com sucesso!");
+      }
+      alert("Erro ao editar conta."); 
+    }
 
   return (
     <div className='container'>
@@ -93,40 +96,50 @@ function Account() {
         <label>
           Nome:
           <input
-            type="text" name="nome" placeholder="Nome" 
-            value={form.nome} onChange={handleChange} disabled={desabilitado} ref={inputName}/>
+            type="text" name="name" placeholder="Nome" 
+            value={form.name} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>
           Tipo:
-          <select name="tipo" value={form.tipo} onChange={handleChange} disabled={desabilitado} ref={inputType}>
+          <select name="type" value={form.type} onChange={handleChange} disabled={desabilitado}>
             <option value="Interna">Interna</option>
             <option value="Externa">Externa</option>
           </select>
         </label>
 
         <label>Descricao:</label>
-        <textarea id="descricao" name="descricao" rows="4" cols="50"
-          value={form.descricao} onChange={handleChange} disabled={desabilitado} ref={inputDesc}>
+        <textarea name="description" rows="4" cols="50"
+          value={form.description} onChange={handleChange} disabled={desabilitado}>
         </textarea>
 
-          <p>
+          
           {!contaRecebida ? (
-            <button type="button" onClick={createAccount}>Criar</button>
+            <p>
+              <button type="button" onClick={createAccount}>Criar</button>
+            </p>
           ) : (
             <>
+            <label>
+              Status:
+              <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>
+                <option value="Ativa">Ativa</option>
+                <option value="Inativa">Inativa</option>
+                <option value="Suspensa">Suspensa</option>
+              </select>
+            </label>
+            <p>
               <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>
                 Editar
               </button>
-              <button type="button" onClick={handleSubmit} disabled={!salvarHabilitado}>
+              <button type="button" onClick={updateAccount} disabled={!salvarHabilitado}>
                 Salvar
               </button>
               <button type="button" onClick={handleCancelar} disabled={!cancelarHabilitado}>
                 Cancelar
               </button>
-            </>
+            </p></>
           )}
-        </p>
       </form>
     </div>
   )

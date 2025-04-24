@@ -15,6 +15,45 @@ function AccountList() {
     setContas(accountsFromApi.data.result)
   }
 
+  const [form, setForm] = useState({
+    name: "",
+    type: "",
+    status: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  async function searchAccounts(){
+    const inputs = Object.fromEntries(
+      Object.entries(form).filter(([_, v]) => v !== '')
+    );
+    const accountsFromApi = await api.post('/accounts/list', inputs);
+
+    if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
+    alert("Erro ao buscar contas.");
+  }
+
+  async function deleteAccount(id){
+    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Suspensa"}});
+    if (accountsFromApi.data.status == 200) {
+      searchAccounts();
+      return alert("Conta suspensa com sucesso!");
+    }
+    alert("Erro ao suspender conta.");
+  }
+
+  async function reactivateAccount(id){
+    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Ativa"}});
+    if (accountsFromApi.data.status == 200) {
+      searchAccounts();
+      return alert("Conta ativada com sucesso!");
+    }
+    alert("Erro ao ativar conta.");
+  }
+
   useEffect(() =>{
     getAccounts()
   }, [])
@@ -27,28 +66,29 @@ function AccountList() {
           <h1>Pagina de Lista de Contas</h1>
             <label>
               Tipo:
-              <select name="origem">
+              <select name="type" onChange={handleChange}>
                 <option value="">Todas</option>
-                <option value="">Interna</option>
-                <option value="">Externa</option>
+                <option value="Interna">Interna</option>
+                <option value="Externa">Externa</option>
               </select>
             </label>
 
             <label>
               Nome:
-              <input type="text" name="vanomelor" placeholder="Nome" />
+              <input type="text" name="name" placeholder="Nome" onChange={handleChange}/>
             </label>
 
             <label>
               Status:
-              <select name="status">
+              <select name="status" onChange={handleChange}>
+                <option value="">Todas</option>
                 <option value="Ativa">Ativa</option>
                 <option value="Inativa">Inativa</option>
                 <option value="Suspensa">Suspensa</option>
               </select>
             </label>
 
-            <button type="submit">Filtrar</button>
+            <button type="button" onClick={searchAccounts}>Filtrar</button>
           </form>
 
           <table>
@@ -70,9 +110,9 @@ function AccountList() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (c.status === 'Suspensa') {
-                        console.log('Essa cação será reativada:', c.id);
+                        reactivateAccount(c.id);
                       } else {
-                        console.log('Deletar cação:', c.id);
+                        deleteAccount(c.id);
                       }
                     }}
                   >
