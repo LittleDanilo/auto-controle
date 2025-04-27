@@ -75,7 +75,7 @@ function Transaction() {
   };
 
   async function newTransaction(){
-    if (form.description == '' || form.value == '' || form.date == '') return alert("Preencha todos os campos.")
+    if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
     if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
@@ -88,8 +88,8 @@ function Transaction() {
 
   async function updateTransaction(){
 
-    if (form.descripton == '' || form.value == '') return alert("A descricao e o valor devem ser preenchidos.")
-    if (form.origin == form.destiny) return alert("As contas de origem e destino nao podem ser iguais.");
+    if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
+    if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("As contas de origem e destino nao podem ser iguais.");
     const accountsFromApi = await api.post('/transactions/update', {
       id: transacaoRecebida.id,
       fields: form
