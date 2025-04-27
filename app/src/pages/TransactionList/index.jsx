@@ -1,115 +1,84 @@
-import './style.css'
 import Menu from '../../components/Menu'
-import { MdDelete } from 'react-icons/md'
+import { MdDelete, MdAdd } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import api from '../../services/api'
 
 function TransactionList() {
 
-  const transacoes = [
-    {
-      id_transacao: 1,
-      conta_origem: 101,
-      conta_destino: 202,
-      valor: 1500.75,
-      data_transferencia: "2025-04-10T10:30:00",
-      descricao: "Pagamento de serviços",
-      status: "Concluida",
-      created_at: "2025-04-10T09:15:00",
-      updated_at: "2025-04-10T10:30:00"
-    },
-    {
-      id_transacao: 2,
-      conta_origem: 103,
-      conta_destino: 204,
-      valor: 500.00,
-      data_transferencia: "2025-04-11T14:45:00",
-      descricao: "Transferência para parceiro",
-      status: "Concluida",
-      created_at: "2025-04-11T14:00:00",
-      updated_at: "2025-04-11T14:00:00"
-    },
-    {
-      id_transacao: 3,
-      conta_origem: 105,
-      conta_destino: 206,
-      valor: 250.25,
-      data_transferencia: "2025-04-12T08:00:00",
-      descricao: "Reembolso de despesas",
-      status: "Concluida",
-      created_at: "2025-04-12T07:30:00",
-      updated_at: "2025-04-12T07:45:00"
-    }
-  ];
+  const navigate = useNavigate();
 
-  const contas = [
-    {
-      id_conta: 1,
-      nome: "Conta Corrente Interna 1",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:00:00",
-      updated_at: "2025-04-10T10:00:00"
-    },
-    {
-      id_conta: 2,
-      nome: "Conta Corrente Interna 2",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:30:00",
-      updated_at: "2025-04-10T10:30:00"
-    },
-    {
-      id_conta: 3,
-      nome: "Conta Corrente Interna 3",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Suspensa",
-      created_at: "2025-04-11T12:00:00",
-      updated_at: "2025-04-11T12:00:00"
-    },
-    {
-      id_conta: 4,
-      nome: "Conta Corrente Externa 1",
-      descricao: "Conta externa utilizada para pagamento de serviços",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T09:00:00",
-      updated_at: "2025-04-10T09:00:00"
-    },
-    {
-      id_conta: 5,
-      nome: "Conta Corrente Externa 2",
-      descricao: "Conta externa utilizada para pagamento de fornecedores",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T11:00:00",
-      updated_at: "2025-04-10T11:00:00"
-    },
-    {
-      id_conta: 6,
-      nome: "Conta Corrente Externa 3",
-      descricao: "Conta externa de operações bancárias",
-      tipo: "Externa",
-      status: "Inativa",
-      created_at: "2025-04-10T14:00:00",
-      updated_at: "2025-04-10T14:00:00"
+  const [contas, setContas] = useState({});
+  
+  async function getAccounts(){
+    const accountsFromApi = await api.post('/accounts/list')
+    setContas(accountsFromApi.data.result)
+  }
+
+  const [transacoes, setTrans] = useState({});
+  
+  async function getTransactions(){
+    const transactionsFromApi = await api.post('/transactions/list')
+    setTrans(transactionsFromApi.data.result)
+  }
+
+  useEffect(() =>{
+      getAccounts();
+      getTransactions();
+    }, [])
+
+  const [form, setForm] = useState({
+      name: "",
+      type: "",
+      status: ""
+    });
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  async function searchTransactions(){
+    const inputs = Object.fromEntries(
+      Object.entries(form).filter(([_, v]) => v !== '')
+    );
+    const transactionsFromApi = await api.post('/transactions/list', inputs);
+
+    if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
+    alert("Erro ao buscar transacoes.");
+  }
+
+  async function cancelTransaction(id){
+    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Cancelada"}});
+    if (transactionsFromApi.data.status == 200) {
+      searchTransactions();
+      return alert("Transacao cancelada com sucesso!");
     }
-  ];
+    alert("Erro ao cancelar transacao.");
+  }
+
+  async function reactivateTransaction(id){
+    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Concluida"}});
+    if (transactionsFromApi.data.status == 200) {
+      searchTransactions();
+      return alert("Transacao retomada com sucesso!");
+    }
+    alert("Erro ao retomar conta.");
+  }
   
   return (
     <div className='container'>
       <Menu />
         
           <form className='container'>
-          <h1>Pagina de Lista de Transacoes</h1>
+          <h1>Listar de Transacoes</h1>
             <label>
               Origem:
-              <select name="origem">
+              <select name="origin" onChange={handleChange}>
                 <option value="">Todas</option>
-                {contas.map((conta) => (
-                  <option key={conta.id_conta} value={conta.id_conta}>
-                  {conta.nome}
+                {Array.isArray(contas) && contas.map((conta) => (
+                  <option key={conta.id} value={conta.id}>
+                  {conta.name}
                   </option>
                 ))}
               </select>
@@ -117,11 +86,11 @@ function TransactionList() {
 
             <label>
               Destino:
-              <select name="destino">
+              <select name="destiny" onChange={handleChange}>
                 <option value="">Todas</option>
-                {contas.map((conta) => (
-                  <option key={conta.id_conta} value={conta.id_conta}>
-                    {conta.nome}
+                {Array.isArray(contas) && contas.map((conta) => (
+                  <option key={conta.id} value={conta.id}>
+                    {conta.name}
                   </option>
                 ))}
               </select>
@@ -129,24 +98,25 @@ function TransactionList() {
 
             <label>
               Valor:
-              <input type="number" name="valor" placeholder="Valor" />
+              <input type="number" name="value" placeholder="Valor" onChange={handleChange}/>
             </label>
 
             <label>
               Data:
-              <input type="date" name="data" />
+              <input type="date" name="date" onChange={handleChange}/>
             </label>
 
             <label>
               Status:
-              <select name="status">
-                <option value="">Concluida</option>
-                <option value="">Pendente</option>
-                <option value="">Cancelada</option>
+              <select name="status" onChange={handleChange}>
+                <option value="">Todas</option>
+                <option value="Concluida">Concluida</option>
+                <option value="Pendente">Pendente</option>
+                <option value="Cancelada">Cancelada</option>
               </select>
             </label>
 
-            <button type="submit">Filtrar</button>
+            <button type="button" onClick={searchTransactions}>Filtrar</button>
           </form>
 
           <table>
@@ -157,20 +127,46 @@ function TransactionList() {
                 <th>Destino</th>
                 <th>Valor</th>
                 <th>Descrição</th>
-                <th>Cancelar</th>
+                <th>Status</th>
+                <th>Modificar</th>
               </tr>
             </thead>
             <tbody>
-              {transacoes.map((trans) => (
-                <tr key={trans.id_transacao}>
-                  <td>{new Date(trans.data_transferencia).toLocaleDateString()}</td>
-                  <td>{trans.conta_origem}</td>
-                  <td>{trans.conta_destino}</td>
-                  <td>R$ {trans.valor.toFixed(2)}</td>
-                  <td>{trans.descricao}</td>
-                  <td><MdDelete size={28} className="trash" /></td>
-                </tr>
-              ))}
+              {Array.isArray(transacoes) && transacoes.map((t) => {
+                const contaOrigem = contas.find((c) => c.id === t.origin);
+                const contaDestino = contas.find((c) => c.id === t.destiny);
+
+                return (
+                  <tr
+                    key={t.id}
+                    onClick={() => navigate('/transacoes', { state: { transacaoRecebida: t } })}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{new Date(t.date).toLocaleDateString()}</td>
+                    <td>{contaOrigem?.name || 'Origem não encontrada'}</td>
+                    <td>{contaDestino?.name || 'Destino não encontrado'}</td>
+                    <td className='valor'>R$ {parseFloat(t.value).toFixed(2)}</td>
+                    <td>{t.description}</td>
+                    <td>{t.status}</td>
+                    <td
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (t.status === 'Cancelada') {
+                          reactivateTransaction(t.id);
+                        } else {
+                          cancelTransaction(t.id);
+                        }
+                      }}
+                    >
+                      {t.status === 'Cancelada' ? (
+                        <MdAdd size={28} className="plus" />
+                      ) : (
+                        <MdDelete size={28} className="trash" />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
     </div>

@@ -1,87 +1,94 @@
-import './style.css'
 import Menu from '../../components/Menu'
-import { MdDelete } from 'react-icons/md'
+import { MdDelete, MdAdd } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import api from '../../services/api'
 
 function AccountList() {
 
-  const contas = [
-    {
-      id_conta: 1,
-      nome: "Conta Corrente Interna 1",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:00:00",
-      updated_at: "2025-04-10T10:00:00"
-    },
-    {
-      id_conta: 2,
-      nome: "Conta Corrente Interna 2",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Ativa",
-      created_at: "2025-04-10T10:30:00",
-      updated_at: "2025-04-10T10:30:00"
-    },
-    {
-      id_conta: 3,
-      nome: "Conta Corrente Interna 3",
-      descricao: "Conta utilizada para transações internas",
-      tipo: "Interna",
-      status: "Suspensa",
-      created_at: "2025-04-11T12:00:00",
-      updated_at: "2025-04-11T12:00:00"
-    },
-    {
-      id_conta: 4,
-      nome: "Conta Corrente Externa 1",
-      descricao: "Conta externa utilizada para pagamento de serviços",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T09:00:00",
-      updated_at: "2025-04-10T09:00:00"
-    },
-    {
-      id_conta: 5,
-      nome: "Conta Corrente Externa 2",
-      descricao: "Conta externa utilizada para pagamento de fornecedores",
-      tipo: "Externa",
-      status: "Ativa",
-      created_at: "2025-04-10T11:00:00",
-      updated_at: "2025-04-10T11:00:00"
-    },
-    {
-      id_conta: 6,
-      nome: "Conta Corrente Externa 3",
-      descricao: "Conta externa de operações bancárias",
-      tipo: "Externa",
-      status: "Inativa",
-      created_at: "2025-04-10T14:00:00",
-      updated_at: "2025-04-10T14:00:00"
+  const navigate = useNavigate();
+
+  const [contas, setContas] = useState({});
+
+  async function getAccounts(){
+    const accountsFromApi = await api.post('/accounts/list')
+    setContas(accountsFromApi.data.result)
+  }
+
+  const [form, setForm] = useState({
+    name: "",
+    type: "",
+    status: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  async function searchAccounts(){
+    const inputs = Object.fromEntries(
+      Object.entries(form).filter(([_, v]) => v !== '')
+    );
+    const accountsFromApi = await api.post('/accounts/list', inputs);
+
+    if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
+    alert("Erro ao buscar contas.");
+  }
+
+  async function deleteAccount(id){
+    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Suspensa"}});
+    if (accountsFromApi.data.status == 200) {
+      searchAccounts();
+      return alert("Conta suspensa com sucesso!");
     }
-  ];
+    alert("Erro ao suspender conta.");
+  }
+
+  async function reactivateAccount(id){
+    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Ativa"}});
+    if (accountsFromApi.data.status == 200) {
+      searchAccounts();
+      return alert("Conta ativada com sucesso!");
+    }
+    alert("Erro ao ativar conta.");
+  }
+
+  useEffect(() =>{
+    getAccounts()
+  }, [])
   
   return (
     <div className='container'>
       <Menu />
         
           <form className='container'>
-          <h1>Pagina de Lista de Contas</h1>
+          <h1>Listar de Contas</h1>
             <label>
               Tipo:
-              <select name="origem">
+              <select name="type" onChange={handleChange}>
                 <option value="">Todas</option>
-                <option value="">Interna</option>
-                <option value="">Externa</option>
+                <option value="Interna">Interna</option>
+                <option value="Externa">Externa</option>
               </select>
             </label>
 
             <label>
               Nome:
-              <input type="text" name="vanomelor" placeholder="Nome" />
+              <input type="text" name="name" placeholder="Nome" onChange={handleChange}/>
             </label>
 
-            <button type="submit">Filtrar</button>
+            <label>
+              Status:
+              <select name="status" onChange={handleChange}>
+                <option value="">Todas</option>
+                <option value="Ativa">Ativa</option>
+                <option value="Inativa">Inativa</option>
+                <option value="Suspensa">Suspensa</option>
+              </select>
+            </label>
+
+            <button type="button" onClick={searchAccounts}>Filtrar</button>
           </form>
 
           <table>
@@ -90,16 +97,37 @@ function AccountList() {
                 <th>Nome</th>
                 <th>Tipo</th>
                 <th>Descrição</th>
-                <th>Cancelar</th>
+                <th>Status</th>
+                <th>Modificar</th>
               </tr>
             </thead>
             <tbody>
-              {contas.map((c) => (
-                <tr key={c.id_conta}>
-                  <td>{c.nome}</td>
-                  <td>{c.tipo}</td>
-                  <td>{c.descricao}</td>
-                  <td><MdDelete size={28} className="trash" /></td>
+              {Array.isArray(contas) && contas.map((c) => (
+                <tr 
+                  key={c.id}
+                  onClick={() => navigate('/contas', { state: { contaRecebida: c } })}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td>{c.name}</td>
+                  <td>{c.type}</td>
+                  <td>{c.description}</td>
+                  <td>{c.status}</td>
+                  <td
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (c.status === 'Suspensa') {
+                        reactivateAccount(c.id);
+                      } else {
+                        deleteAccount(c.id);
+                      }
+                    }}
+                  >
+                    {c.status === 'Suspensa' ? (
+                      <MdAdd size={28} className="plus" />
+                    ) : (
+                      <MdDelete size={28} className="trash" />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
