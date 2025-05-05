@@ -1,5 +1,6 @@
-const {db} = require('./db');
+const db = require('./db');
 const { DataTypes } = require('sequelize');
+const Users = require('./Users');
 
 const Accounts = db.define('Accounts', {
     id: {
@@ -8,6 +9,9 @@ const Accounts = db.define('Accounts', {
         autoIncrement: true
     },
     createBy: {
+        type: DataTypes.INTEGER
+    },
+    updateBy: {
         type: DataTypes.INTEGER
     },
     name: {
@@ -31,6 +35,7 @@ const Accounts = db.define('Accounts', {
     }
 });
 
-Accounts.belongsTo(Accounts, { foreignKey: 'createbBy', as: 'UserCreator' });
+Accounts.belongsTo(Users, { foreignKey: 'createbBy', as: 'UserCreator' });
+Accounts.belongsTo(Users, { foreignKey: 'updatedBy', as: 'UserUpdater' });
 
 module.exports = Accounts;
