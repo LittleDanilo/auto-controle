@@ -1,26 +1,29 @@
 # Auto Controle
 
-## Instalar o Docker
+Siga o passo a passo abaixo para executar esse programa.
 
-- Faça a instalação do [Docker](https://www.docker.com).
+## Instalando o Git
 
-- **Subindo Container com Mysql**
-    Caso você já tenha o mysql instalado, tudo que você precissará é descobrir o seu endereço de IP e adiciona-lo como DB_HOST e preencher corretamente os campos do arquivo .env localizado na pasta ./api.
+- Acesse o site [git](https://git-scm.com/) e faça o download clicando no botão **Download for Windows**
 
-    Caso não tenha, você terá que criar um container para rodar o banco de dados, para isso, abra o Terminal e execute o comando a seguir, Substituindo todas as variaveis que estão com "<<>>":
-        `docker run -d --name mysql-standalone -e MYSQL_ROOT_PASSWORD=<<ROOTPASSWORD>> -e MYSQL_DATABASE=auto_controle -e MYSQL_USER=<<USE NAME>> -e MYSQL_PASSWORD=<<USER PASSWORD>>  -p 3306:3306 mysql:8.0`
+## Instalando o Docker
 
-    Após isso, vocẽ vai precisar conectar esse container com a network do software, rodando esse comando:
-        `docker network connect auto-controle_auto-controle-network mysql-standalone`
+- Acesse o site [docker](https://www.docker.com/).
+- Clique em Download Docker Desktop e selecione seu sistema operacional.
+- Faça uma conta para utilizar.
 
-## Como Rodar
+## Clonando Repositorio
 
-Configure o arquivo **.env.exemple**, deletando a extenção .exemple e preenchendo os dados com os dados do seu banco de dados.
-vá ao arquivo index.js localizado em **./api/index.js** e descomente a linha 13.
+- Abra o terminal usando o comando `Win+R` e buscando por cmd, ou pesquisando terminal na barra de pesquisa do windows.
+- Use o comando `git clone https://github.com/LittleDanilo/auto-controle.git`
 
-Com todo o setup pronto, você só precisa rodar o comando:
-`docker-compose up`
-Que irá subir 2 containers novos, com o sistema.
+## Rodando o programa
 
-Assim que terminar a execução e ele ficar esperando os containers atualizarem, seu cursor vai ficar piscando como se fosse para digitar algo, você deverá **comentar novamente a linha 13.**
-Agora é só acessar o app, em [site](http://localhost:5173).
+- Duplique os arquivos `.env.example` que estão na pasta raiz do projeto e na pasta `api`, e altere variavel `DB_ROOT_PASSWORD`
+- Renomeio o arquivo para `.env` apenas.
+- Abra o terminal novamente e navegue para a pasta raiz do projeto, utilizando o comando **cd auto-controle**
+- Execute o comando `docker-compose up` para inicializar o programa.
+
+## Encerrando execução
+
+- Precione `Ctrl + C` no terminal, e depois rode o comando `docker-compose down`
