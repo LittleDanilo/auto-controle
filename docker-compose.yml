@@ -15,6 +15,7 @@ services:
   api:
     build: ./api
     container_name: auto-controle-api
+    env_file: .env
     ports:
       - "5000:5000"
 #    volumes:
@@ -28,6 +29,7 @@ services:
   app:
     build: ./app
     container_name: auto-controle-app
+    env_file: .env
     ports:
       - "5173:5173"
 #    volumes:

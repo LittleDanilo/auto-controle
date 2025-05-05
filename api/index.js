@@ -1,6 +1,6 @@
 // requirements
 const dotenv = require('dotenv').config();
-const {db, auth} = require('./src/Models/db');
+const {auth} = require('./src/Models/db');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -32,7 +32,7 @@ app.use('/accounts', require('./src/Routes/accounts'));
 app.use('/transactions', require('./src/Routes/transaction'));
 
 // server
-app.listen(process.env.PORT, () => {
+app.listen(process.env.API_PORT, process.env.API_HOST,() => {
     console.log('server online');
     console.log('Acesse http://localhost:5173');
 });
