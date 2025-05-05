@@ -1,4 +1,4 @@
-FROM node:lts-bullseye
+FROM node:slim
 
 WORKDIR /usr/auto-controle/app
 COPY ./package*.json ./
