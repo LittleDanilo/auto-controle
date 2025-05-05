@@ -1,18 +1,26 @@
 // requirements
 const dotenv = require('dotenv').config();
-const db = require('./src/Models/db');
+const {db, auth} = require('./src/Models/db');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 // data base connection test
-db.authenticate()
-    .then(console.log("conexão bem-sucedida"))
-    .catch((err) => {console.log(err)});
+let connected = false;
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-// Descomente e execute quando quiser criar as tabelas do seu banco de dados.
-//db.sync({force:true});
-// server config
+async function test() {
+    while (connected != true) {
+        await delay(5000);
+        console.log("try");
+        connected = await auth();
+    }
+    console.log("connected");
+}
+test();
+
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -27,4 +35,3 @@ app.use('/transactions', require('./src/Routes/transaction'));
 app.listen(process.env.PORT, () => {
     console.log('server online');
 });
-

@@ -1,4 +1,4 @@
-const db = require('./db');
+const {db} = require('./db');
 const { DataTypes } = require('sequelize');
 
 const Accounts = db.define('Accounts', {
@@ -6,6 +6,9 @@ const Accounts = db.define('Accounts', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
+    },
+    createBy: {
+        type: DataTypes.INTEGER
     },
     name: {
         type: DataTypes.STRING
@@ -27,5 +30,7 @@ const Accounts = db.define('Accounts', {
         }
     }
 });
+
+Accounts.belongsTo(Accounts, { foreignKey: 'createbBy', as: 'UserCreator' });
 
 module.exports = Accounts;

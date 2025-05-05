@@ -1,5 +1,17 @@
 version: '3'
 services:
+  database:
+    image: mysql:8.0
+    container_name: database
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3306:3306"
+    restart: always
+    networks:
+      - auto-controle-network
   api:
     build: ./api
     container_name: auto-controle-api
@@ -8,8 +20,11 @@ services:
     volumes:
       - "./api:/usr/auto-controle/api"
       - "./api/node_modules:/usr/auto-controle/api/node_modules"
+    restart: always
     networks:
       - auto-controle-network
+    depends_on:
+     - database
   app:
     build: ./app
     container_name: auto-controle-app
@@ -19,6 +34,7 @@ services:
       - "./app:/usr/auto-controle/app"
       - "/usr/auto-controle/app/node_modules"
     command: npm run dev -- --host
+    restart: always
     networks:
       - auto-controle-network
 
