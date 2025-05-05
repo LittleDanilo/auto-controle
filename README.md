@@ -23,6 +23,7 @@ Siga o passo a passo abaixo para executar esse programa.
 - Renomeio o arquivo para `.env` apenas.
 - Abra o terminal novamente e navegue para a pasta raiz do projeto, utilizando o comando **cd auto-controle**
 - Execute o comando `docker-compose up` para inicializar o programa.
+- Agora é só acessar o site clicando [aqui](http://localhost:5173);
 
 ## Encerrando execução
 

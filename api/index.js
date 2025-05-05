@@ -13,7 +13,7 @@ function delay(ms) {
 
 async function test() {
     while (connected != true) {
-        await delay(5000);
+        await delay(15000);
         console.log("try");
         connected = await auth();
     }
@@ -34,4 +34,5 @@ app.use('/transactions', require('./src/Routes/transaction'));
 // server
 app.listen(process.env.PORT, () => {
     console.log('server online');
+    console.log('Acesse http://localhost:5173');
 });

@@ -17,9 +17,9 @@ services:
     container_name: auto-controle-api
     ports:
       - "5000:5000"
-    volumes:
-      - "./api:/usr/auto-controle/api"
-      - "./api/node_modules:/usr/auto-controle/api/node_modules"
+#    volumes:
+#      - "./api:/usr/auto-controle/api"
+#      - "./api/node_modules:/usr/auto-controle/api/node_modules"
     restart: always
     networks:
       - auto-controle-network
@@ -30,9 +30,9 @@ services:
     container_name: auto-controle-app
     ports:
       - "5173:5173"
-    volumes:
-      - "./app:/usr/auto-controle/app"
-      - "/usr/auto-controle/app/node_modules"
+#    volumes:
+#      - "./app:/usr/auto-controle/app"
+#      - "/usr/auto-controle/app/node_modules"
     command: npm run dev -- --host
     restart: always
     networks:
