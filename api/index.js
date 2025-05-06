@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // routes
+app.use(require('./src/Middlewares/Users/LoginVerification'));
 app.use('/users', require('./src/Routes/users'));
 app.use('/accounts', require('./src/Routes/accounts'));
 app.use('/transactions', require('./src/Routes/transaction'));

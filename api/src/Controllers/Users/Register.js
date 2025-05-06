@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
         const { name, email, password } = req.body;
         const user = await RegisterService.userRegister(name, email, password);
         res.status(200).json({status: 200, result: user.id});
-    } catch (error) {
-        res.status(200).json({status: 400, error: error});
+    } catch (err) {
+        res.status(200).json({status: 400, error: err.message});
     }
 };
