@@ -19,8 +19,8 @@ Siga o passo a passo abaixo para executar esse programa.
 
 ## Rodando o programa
 
-- Duplique o arquivos `.env.example` que esta na pasta raiz do projeto e altere as variaveis do arquivo.
-- Renomeio o arquivo para `.env` apenas.
+- Duplique o arquivo `.env.example` que esta na pasta raiz do projeto e altere as variaveis do arquivo.
+- Renomeie o arquivo para `.env` apenas.
 - Abra o terminal novamente e navegue para a pasta raiz do projeto, utilizando o comando **cd auto-controle**
 - Execute o comando `docker-compose up` para inicializar o programa.
 - Agora é só acessar o site clicando [aqui](http://localhost:5173);
