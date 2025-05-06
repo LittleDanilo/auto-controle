@@ -11,7 +11,7 @@ module.exports = async () => {
             await db.authenticate();
             var tables = await db.showAllSchemas();
             if (tables.length == 0) await db.sync({force:true});
-            console.log("\n=======Database Connected.=======");
+            console.log("\n=======Database Connected=======");
             break;
         } catch (err) {
             console.log(`Error in database connection: ${err.message}`);

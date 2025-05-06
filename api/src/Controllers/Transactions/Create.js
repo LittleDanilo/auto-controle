@@ -3,9 +3,9 @@ const RegisterTransactionsService = require('../../Services/Transactions/Registe
 module.exports = async (req, res) => {
     try {
         const { origin, destiny, value, date, description } = req.body;
-        const transaction = await RegisterTransactionsService.register(origin, destiny, value, date, description);
-        return res.status(200).json({status: 200, transaction});
+        const result = await RegisterTransactionsService.register(origin, destiny, value, date, description);
+        return res.status(200).json({status: 200, result});
     } catch (err) {
-        return res.status(500).json({status: 500, error: err.message});
+        return res.status(200).json({status: 400, error: err});
     }
 }

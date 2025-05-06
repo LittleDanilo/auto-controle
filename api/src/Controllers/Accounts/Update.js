@@ -4,8 +4,8 @@ module.exports = async (req, res) => {
     try{
         let {fields, id} = req.body;
         const account = await UpdateAccountService.execute({fields}, id);
-        return res.status(200).json({status: 200, account: account});
-    } catch (Error) {
-        return res.status(400).json({error: Error});
+        return res.status(200).json({status: 200, result: account});
+    } catch (err) {
+        return res.status(200).json({status: 400, error: err});
     }
 }

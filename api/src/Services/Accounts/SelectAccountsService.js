@@ -1,4 +1,5 @@
 const Accounts = require('../../Models/Accounts');
+const { Op } = require("sequelize");
 
 class SelectAccountsService {
     static async execute({where}) {
