@@ -4,12 +4,8 @@ class AuthService {
     static async userAuthentication(email, password) {
         const user = await Users.findOne({where: {email: email}});
 
-        if (!user) {
-            throw new Error('User not found.');
-        }
-        if (password != user.password) {
-            throw new Error('Invalid password.');
-        }
+        if (!user) throw new Error('Usuário não encontrado');
+        if (password != user.password) throw new Error('Senha inválida.');
         return user;
     }
 }

@@ -4,7 +4,7 @@ class SelectTransactionsService {
     static async execute({where}) {
         try {
             const result = await Transacions.findAll({where});
-            if (result.length == 0) return "Transaction not found.";
+            if (result.length == 0) return "Transação não encontrada";
             return result;
         } catch (err) {
             console.log(err);

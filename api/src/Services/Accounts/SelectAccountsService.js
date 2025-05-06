@@ -5,7 +5,7 @@ class SelectAccountsService {
     static async execute({where}) {
         try {
             const result = await Accounts.findAll({where});
-            if (result.length == 0) return "Account not found.";
+            if (result.length == 0) return "Conta não encontrada.";
             return result;
         } catch (err) {
             console.log(err);
