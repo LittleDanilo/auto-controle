@@ -9,12 +9,6 @@ const Transactions = db.define('Transactions', {
         primaryKey: true,
         autoIncrement: true
     },
-    createBy: {
-        type: DataTypes.INTEGER
-    },
-    updateBy: {
-        type: DataTypes.INTEGER
-    },
     origin: {
         type: DataTypes.INTEGER
     },
@@ -25,7 +19,7 @@ const Transactions = db.define('Transactions', {
         type: DataTypes.DECIMAL(15,2)
     },
     date: {
-        type: DataTypes.DATE
+        type: DataTypes.DATEONLY
     },
     description: {
         type: DataTypes.TEXT,

@@ -4,7 +4,7 @@ const {Op} = require('sequelize');
 module.exports = async (req, res) => {
     try {
         let where = {};
-        const {id, name, type, status} = req.body;
+        const {id, name, type, status} = req.body.data;
 
         if (id) where.id = id;
         if (name) where.name = {[Op.like]: `%${name}%`};

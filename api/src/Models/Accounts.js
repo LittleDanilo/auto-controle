@@ -8,12 +8,6 @@ const Accounts = db.define('Accounts', {
         primaryKey: true,
         autoIncrement: true
     },
-    createBy: {
-        type: DataTypes.INTEGER
-    },
-    updateBy: {
-        type: DataTypes.INTEGER
-    },
     name: {
         type: DataTypes.STRING
     },
@@ -35,7 +29,7 @@ const Accounts = db.define('Accounts', {
     }
 });
 
-Accounts.belongsTo(Users, { foreignKey: 'createbBy', as: 'UserCreator' });
+Accounts.belongsTo(Users, { foreignKey: 'createdBy', as: 'UserCreator' });
 Accounts.belongsTo(Users, { foreignKey: 'updatedBy', as: 'UserUpdater' });
 
 module.exports = Accounts;
