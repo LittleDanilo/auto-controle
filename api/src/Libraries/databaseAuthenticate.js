@@ -11,13 +11,15 @@ module.exports = async () => {
         try {
             await db.authenticate();
             var tables = await db.showAllSchemas();
-            if (tables.length == 0) await db.sync({force:true});
-            await Users.create({
-                name: 'admin',
-                password: 'admin123',
-                email: 'admin@auto.controle',
-                status: 'Ativo'
-            });
+            if (tables.length == 0) {
+                await db.sync({force:true});
+                await Users.create({
+                    name: 'admin',
+                    password: 'admin123',
+                    email: 'admin@auto.controle',
+                    status: 'Ativo'
+                });
+            }
             console.log("\n=======Database Connected=======");
             break;
         } catch (err) {
