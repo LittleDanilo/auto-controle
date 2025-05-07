@@ -17,7 +17,7 @@ app.use('/accounts', require('./src/Routes/accounts'));
 app.use('/transactions', require('./src/Routes/transaction'));
 
 // server
-app.listen(process.env.API_PORT, process.env.API_HOST,async () => {
+app.listen(process.env.API_PORT, process.env.API_HOST, async () => {
     await databaseAuthenticate()
     console.log('=========Server Online==========');
     console.log('Acesse http://localhost:5173');

@@ -1,5 +1,6 @@
 const delay = require('./delay');
 const db = require('../Models/db');
+const Users = require('../Models/Users');
 
 module.exports = async () => {
     let connected = false;
@@ -11,6 +12,12 @@ module.exports = async () => {
             await db.authenticate();
             var tables = await db.showAllSchemas();
             if (tables.length == 0) await db.sync({force:true});
+            await Users.create({
+                name: 'admin',
+                password: 'admin123',
+                email: 'admin@auto.controle',
+                status: 'Ativo'
+            });
             console.log("\n=======Database Connected=======");
             break;
         } catch (err) {
