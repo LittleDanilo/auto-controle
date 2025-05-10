@@ -1,4 +1,4 @@
-const {db} = require('./db');
+const db = require('./db');
 const { DataTypes } = require('sequelize');
 
 const Users = db.define('Users', {
@@ -6,6 +6,10 @@ const Users = db.define('Users', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+    },
+    status: {
+        type: DataTypes.STRING,
+        isIn: [['Ativo', 'Desativado', 'Excluido']]
     },
     name: {
         type: DataTypes.STRING,

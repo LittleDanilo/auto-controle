@@ -1,9 +1,11 @@
 const Transacions = require('../../Models/Transactions');
 
 class RegisterTransactionsService {
-    static async register(origin, destiny, value, date, description) {
+    static async register(userID, origin, destiny, value, date, description) {
         try {
             const transaction = await Transacions.create({
+                createdBy: userID,
+                updatedBy: userID,
                 origin,
                 destiny,
                 description,

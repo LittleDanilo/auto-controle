@@ -2,10 +2,9 @@ const SelectAccountsService = require('../../Services/Accounts/SelectAccountsSer
 
 module.exports = async (req, res) => {
     try {
-        const where = req.where;
-        const result = await SelectAccountsService.execute({where});
+        const result = await SelectAccountsService.execute({where: req.body.data});
         return res.status(200).json({status: 200, result: result});
     } catch (err) {
-        return res.status(400).json({status: 400, error: err});
+        return res.status(400).json({status: 400, error: err.message});
     }
 }
