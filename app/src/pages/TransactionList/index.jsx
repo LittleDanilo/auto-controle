@@ -142,7 +142,7 @@ function TransactionList() {
                     onClick={() => navigate('/transacoes', { state: { transacaoRecebida: t } })}
                     style={{ cursor: 'pointer' }}
                   >
-                    <td>{new Date(t.date).toLocaleDateString()}</td>
+                    <td>{t.date.slice(0, 10).split('-').reverse().join('/')}</td>
                     <td>{contaOrigem?.name || 'Origem não encontrada'}</td>
                     <td>{contaDestino?.name || 'Destino não encontrado'}</td>
                     <td className='valor'>R$ {parseFloat(t.value).toFixed(2)}</td>
