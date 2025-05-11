@@ -5,7 +5,8 @@ const { Op } = require("sequelize");
 class SelectAccountsService {
     static async execute({where}) {
         try {
-            if (where.name) where.name = {[Op.like]: `%${where.name}%`};
+            if (where.name) where.name = {[Op.like]: `%${String(where.name).trim()}%`};
+            if (String(where.name).length <= 2) delete where.name;
             const result = await Accounts.findAll({where});
             if (result.length == 0) return "Conta não encontrada.";
 
