@@ -7,14 +7,14 @@ class SelectTransactionsService {
             const result = await Transacions.findAll({where});
             if (result.length == 0) return "Transação não encontrada";
             for (let i in result){
-                let user = await SelectUsersService.execute({where: {id: result[i].createdBy}});
+                let user = await SelectUsersService.execute(1, {where: {id: result[i].createdBy}});
                 result[i].createdBy = {
                     id: user[0].id,
                     name: user[0].name,
                     email: user[0].email,
                 };
 
-                user = await SelectUsersService.execute({where: {id: result[i].updatedBy}});
+                user = await SelectUsersService.execute(1, {where: {id: result[i].updatedBy}});
                 result[i].updatedBy = {
                     id: user[0].id,
                     name: user[0].name,
