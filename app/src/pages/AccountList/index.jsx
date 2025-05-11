@@ -34,22 +34,22 @@ function AccountList() {
 
   async function searchAccounts(){
     
-      const inputs = Object.fromEntries(
-        Object.entries(form).filter(([_, v]) => v !== '')
-      );
+    const inputs = Object.fromEntries(
+      Object.entries(form).filter(([_, v]) => v !== '')
+    );
 
-      try {
-        const accountsFromApi = await api.post('/accounts/list', {
-          userID: currentUser.id,
-          data: inputs
-        })
+    try {
+      const accountsFromApi = await api.post('/accounts/list', {
+        userID: currentUser.id,
+        data: inputs
+      })
 
-        if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
-        return alert(accountsFromApi.data.error);
+      if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
+      return alert(accountsFromApi.data.error);
 
-      } catch (e) {
-        return alert(e.message); 
-      }
+    } catch (e) {
+      return alert(e.message); 
+    }
   }
 
   async function deleteAccount(id){

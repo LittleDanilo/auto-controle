@@ -73,33 +73,53 @@ function User() {
 
     async function createUser(){
 
-      if (form.name == '') return alert("O nome deve ser preenchido")
-      const inputs = Object.fromEntries(
-        Object.entries(form).filter(([_, v]) => v !== '')
-      );
-      const accountsFromApi = await api.post('/users/register', inputs)
-      if (accountsFromApi.data.status == 200) return alert("Conta criada com sucesso!");
-      alert("Erro ao criar conta."); 
+      if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
+      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+      if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
+
+      try {
+        const usersFromApi = await api.post('/users/register', {
+          userID: currentUser.id,
+          data: form
+        })
+
+        if (usersFromApi.data.status == 200) {
+          setForm({name: "",email: "",password: ""}) // Limpa o formulario
+          return alert("Usuario criado com sucesso!");
+        }
+        return alert(usersFromApi.data.error);
+      } catch (e) {
+        return alert(e.message); 
+      }  
     }
 
     async function updateUser(){
 
-      if (form.name == '') return alert("O nome deve ser preenchido")
-      const accountsFromApi = await api.post('/users/update', {
-        id: usuarioRecebido.id,
-        fields: form
-      })
-      if (accountsFromApi.data.status == 200) {
-        const usuarioAtualizado = { id: usuarioAtual.id, ...form };
-        setUsuarioAtual(usuarioAtualizado);
+      if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
+      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+      if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
 
-        setDesabilitado(true);
-        setSalvarHabilitado(false);
-        setEditarHabilitado(true);
-        setCancelarHabilitado(false);
-        return alert("Conta editada com sucesso!");
-      }
-      alert("Erro ao editar conta."); 
+      try {
+        const accountsFromApi = await api.post('/users/update', {
+          userID: currentUser.id,
+          data: {id: contaRecebida.id, fields: form}
+        })
+
+        if (accountsFromApi.data.status == 200) {
+          const contaAtualizada = { id: contaAtual.id, ...form };
+          setContaAtual(contaAtualizada);
+          setDesabilitado(true);
+          setSalvarHabilitado(false);
+          setEditarHabilitado(true);
+          setCancelarHabilitado(false);
+          return alert("Usuario alterado com sucesso!");
+        }
+          return alert(accountsFromApi.data.error);
+      } catch (e) {
+        return alert(e.message); 
+      } 
     }
     
   if (!currentUser) return <p>Carregando ...</p>;
@@ -112,18 +132,22 @@ function User() {
         <label>
           Nome:
           <input
-            type="text" name="name" placeholder="Nome" 
+            type="text" name="name" placeholder="Nome" maxLength="30"
             value={form.name} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>
           Email:
-          <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} disabled={desabilitado}/>
+          <input 
+            type="email" name="email" placeholder="Email" maxLength="30"
+            value={form.email} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>
           Senha:
-          <input type="password" name="password" placeholder="Senha" value={form.password} onChange={handleChange} disabled={desabilitado}/>
+          <input 
+            type="password" name="password" placeholder="Senha" maxLength="30"
+            value={form.password} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
           

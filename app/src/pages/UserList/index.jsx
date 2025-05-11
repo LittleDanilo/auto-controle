@@ -8,13 +8,13 @@ function UserList() {
 
   const navigate = useNavigate();
 
-  const [usuarios, setUsuarios] = useState({});
+  const [usuarios, setListaUsuarios] = useState({});
   const [currentUser, setUser] = useState(null);
 
   async function getUsers(id){
     try {
       const accountsFromApi = await api.post('/users/list', {userID: id})
-      if(accountsFromApi.data.status == 200) return setUsuarios(accountsFromApi.data.result)
+      if(accountsFromApi.data.status == 200) return setListaUsuarios(accountsFromApi.data.result)
       return alert(usersFromApi.data.error);
     } catch (e) {
       return alert(e.message);
@@ -36,28 +36,55 @@ function UserList() {
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-    const accountsFromApi = await api.post('/accounts/list', inputs);
 
-    if (accountsFromApi.data.status == 200) return setUsuarios(accountsFromApi.data.result);
-    alert("Erro ao buscar usuarios.");
+    try {
+      const usersFromApi = await api.post('/accounts/list', {
+        userID: currentUser.id,
+        data: inputs
+      })
+      console.log(usersFromApi.data.result);
+      if  (usersFromApi.data.status == 200) return setListaUsuarios(usersFromApi.data.result);
+      return alert (usersFromApi.data.error);
+
+    } catch (e) {
+      return alert(e.message); 
+    }
   }
 
-  async function deleteAccount(id){
-    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Suspensa"}});
-    if (accountsFromApi.data.status == 200) {
+  async function deleteUser(id){
+    try {
+      const usersFromApi = await api.post('/users/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Excluido"}}
+      });
+
+      if (usersFromApi.data.status == 200) {
         searchUsers();
-      return alert("Conta suspensa com sucesso!");
+        return alert("Usuario excluido com sucesso!");
+      }
+      return alert(usersFromApi.data.error);
+
+    } catch (e) {
+      return alert(e.message); 
     }
-    alert("Erro ao suspender conta.");
   }
 
-  async function reactivateAccount(id){
-    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Ativa"}});
-    if (accountsFromApi.data.status == 200) {
+  async function reactivateUser(id){
+    try {
+      const usersFromApi = await api.post('/users/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Ativo"}}
+      });
+
+      if (usersFromApi.data.status == 200) {
         searchUsers();
-      return alert("Conta ativada com sucesso!");
+        return alert("Usuario ativado com sucesso!");
+      }
+      return alert(usersFromApi.data.error);
+
+    } catch (e) {
+      return alert(e.message); 
     }
-    alert("Erro ao ativar conta.");
   }
 
   useEffect(() =>{
@@ -104,6 +131,7 @@ function UserList() {
               <tr>
                 <th>Nome</th>
                 <th>Email</th>
+                <th>Status</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -121,9 +149,9 @@ function UserList() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (u.status === 'Excluido') {
-                        reactivateAccount(u.id);
+                        reactivateUser(u.id);
                       } else {
-                        deleteAccount(u.id);
+                        deleteUser(u.id);
                       }
                     }}
                   >

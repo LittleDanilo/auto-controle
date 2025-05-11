@@ -111,6 +111,7 @@ function Account() {
           setSalvarHabilitado(false);
           setEditarHabilitado(true);
           setCancelarHabilitado(false);
+          return alert("Conta alterada com sucesso!");
         }
           return alert(accountsFromApi.data.error);
       } catch (e) {
