@@ -1,9 +1,13 @@
 import Menu from '../../components/Menu'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'
 
 function Account() {
+
+  const navigate = useNavigate();
+
+  const [currentUser, setUser] = useState(null);
 
   const location = useLocation();
   const { contaRecebida } = location.state || {};
@@ -22,6 +26,14 @@ function Account() {
     };
   
     const [form, setForm] = useState({ ...valorOriginal });
+
+    useEffect(() => {
+      const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
+      if (!storedUser) {
+        return navigate('/');
+      }
+      setUser(storedUser);
+    }, []);
   
     useEffect(() => {
       if (!contaRecebida) {
@@ -66,41 +78,58 @@ function Account() {
       const inputs = Object.fromEntries(
         Object.entries(form).filter(([_, v]) => v !== '')
       );
-      const accountsFromApi = await api.post('/accounts/register', inputs)
-      if (accountsFromApi.data.status == 200) return alert("Conta criada com sucesso!");
-      alert("Erro ao criar conta."); 
+
+      try {
+        const accountsFromApi = await api.post('/accounts/register', {
+          userID: currentUser.id,
+          data: inputs
+        })
+
+        if (accountsFromApi.data.status == 200) {
+          setForm({name: "",type: "Interna",description: ""}) // Limpa o formulario
+          return alert("Conta criada com sucesso!");
+        }
+        return alert(accountsFromApi.data.error);
+      } catch (e) {
+        return alert(e.message); 
+      }  
     }
 
     async function updateAccount(){
 
       if (form.name == '') return alert("O nome deve ser preenchido")
-      const accountsFromApi = await api.post('/accounts/update', {
-        id: contaRecebida.id,
-        fields: form
-      })
-      if (accountsFromApi.data.status == 200) {
-        const contaAtualizada = { id: contaAtual.id, ...form };
-        setContaAtual(contaAtualizada);
+      try {
+        const accountsFromApi = await api.post('/accounts/update', {
+          userID: currentUser.id,
+          data: {id: contaRecebida.id, fields: form}
+        })
 
-        setDesabilitado(true);
-        setSalvarHabilitado(false);
-        setEditarHabilitado(true);
-        setCancelarHabilitado(false);
-        return alert("Conta editada com sucesso!");
+        if (accountsFromApi.data.status == 200) {
+          const contaAtualizada = { id: contaAtual.id, ...form };
+          setContaAtual(contaAtualizada);
+          setDesabilitado(true);
+          setSalvarHabilitado(false);
+          setEditarHabilitado(true);
+          setCancelarHabilitado(false);
+        }
+          return alert(accountsFromApi.data.error);
+      } catch (e) {
+        return alert(e.message); 
       }
-      alert("Erro ao editar conta."); 
     }
 
+    
+  if (!currentUser) return <p>Carregando ...</p>;
   return (
     <div className='container'>
-      <Menu />
+      <Menu user={currentUser}/>
       <form>
       {!contaRecebida ? (<h1>Nova Conta</h1>) : (<h1>Editar Conta</h1>)}
       
         <label>
           Nome:
           <input
-            type="text" name="name" placeholder="Nome" 
+            type="text" name="name" placeholder="Nome" maxLength="30"
             value={form.name} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
@@ -113,7 +142,7 @@ function Account() {
         </label>
 
         <label>Descricao:</label>
-        <textarea name="description" rows="4" cols="50"
+        <textarea name="description" rows="4" cols="50" maxLength="200"
           value={form.description} onChange={handleChange} disabled={desabilitado}>
         </textarea>
 

@@ -1,10 +1,13 @@
 import Menu from '../../components/Menu'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'
 
 function Transaction() {
 
+  const navigate = useNavigate();
+
+  const [currentUser, setUser] = useState(null);
   const location = useLocation();
   const { transacaoRecebida } = location.state || {};
   const [transacaoAtual, setTransacaoAtual] = useState(transacaoRecebida);
@@ -26,14 +29,24 @@ function Transaction() {
   const [form, setForm] = useState({ ...valorOriginal });
   const [contas, setContas] = useState({});
 
-  async function getAccounts(){
-    const accountsFromApi = await api.post('/accounts/list')
-    setContas(accountsFromApi.data.result)
+  async function getAccounts(id){
+    try {
+      const accountsFromApi = await api.post('/accounts/list', {userID: id})
+      if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
+      return alert(usersFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
-  useEffect(() => {
-    getAccounts();
-  }, []);
+  useEffect(() =>{
+    const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
+      if (!storedUser) {
+        return navigate('/');
+      }
+    setUser(storedUser);
+    getAccounts(storedUser.id);
+  }, [])
 
   useEffect(() => {
     if (!transacaoRecebida) {
@@ -107,9 +120,10 @@ function Transaction() {
     alert("Erro ao editar transacao."); 
   }
 
+  if (!currentUser) return <p>Carregando ...</p>;
   return (
     <div className='container'>
-      <Menu />
+      <Menu user={currentUser}/>
       <form>
       {!transacaoRecebida ? (<h1>Nova Transacao</h1>) : (<h1>Editar Transacao</h1>)}
         <label>

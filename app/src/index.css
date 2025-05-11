@@ -73,6 +73,13 @@ form {
         padding-left: 10px;
         outline: none;
     }
+
+  textarea {
+    width: '100%'; 
+    max-width: '500px';  
+    resize: 'vertical';
+    box-sizing: 'border-box';
+  }
 }
 
 h1 {

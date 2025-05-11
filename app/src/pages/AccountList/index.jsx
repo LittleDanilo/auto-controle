@@ -9,10 +9,16 @@ function AccountList() {
   const navigate = useNavigate();
 
   const [contas, setContas] = useState({});
+  const [currentUser, setUser] = useState(null);
 
-  async function getAccounts(){
-    const accountsFromApi = await api.post('/accounts/list')
-    setContas(accountsFromApi.data.result)
+  async function getAccounts(id){
+    try {
+      const accountsFromApi = await api.post('/accounts/list', {userID: id})
+      if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
+      return alert(usersFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
   const [form, setForm] = useState({
@@ -27,41 +33,74 @@ function AccountList() {
   };
 
   async function searchAccounts(){
-    const inputs = Object.fromEntries(
-      Object.entries(form).filter(([_, v]) => v !== '')
-    );
-    const accountsFromApi = await api.post('/accounts/list', inputs);
+    
+      const inputs = Object.fromEntries(
+        Object.entries(form).filter(([_, v]) => v !== '')
+      );
 
-    if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
-    alert("Erro ao buscar contas.");
+      try {
+        const accountsFromApi = await api.post('/accounts/list', {
+          userID: currentUser.id,
+          data: inputs
+        })
+
+        if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
+        return alert(accountsFromApi.data.error);
+
+      } catch (e) {
+        return alert(e.message); 
+      }
   }
 
   async function deleteAccount(id){
-    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Suspensa"}});
-    if (accountsFromApi.data.status == 200) {
-      searchAccounts();
-      return alert("Conta suspensa com sucesso!");
+    try {
+      const accountsFromApi = await api.post('/accounts/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Suspensa"}}
+      });
+
+      if (accountsFromApi.data.status == 200) {
+        searchAccounts();
+        return alert("Conta suspensa com sucesso!");
+      }
+
+      return alert(accountsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message); 
     }
-    alert("Erro ao suspender conta.");
   }
 
   async function reactivateAccount(id){
-    const accountsFromApi = await api.post('/accounts/update', {id: id, fields: {status: "Ativa"}});
-    if (accountsFromApi.data.status == 200) {
-      searchAccounts();
-      return alert("Conta ativada com sucesso!");
+    try {
+      const accountsFromApi = await api.post('/accounts/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Ativa"}}
+      });
+      
+      if (accountsFromApi.data.status == 200) {
+        searchAccounts();
+        return alert("Conta ativada com sucesso!");
+      }
+
+      return alert(accountsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message); 
     }
-    alert("Erro ao ativar conta.");
   }
 
   useEffect(() =>{
-    getAccounts()
+    const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
+      if (!storedUser) {
+        return navigate('/');
+      }
+    setUser(storedUser);
+    getAccounts(storedUser.id)
   }, [])
   
-  return (
-    <div className='container'>
-      <Menu />
-        
+  if (!currentUser) return <p>Carregando ...</p>;
+    return (
+      <div className='container'>
+        <Menu user={currentUser}/>
           <form className='container'>
           <h1>Listar de Contas</h1>
             <label>
@@ -75,7 +114,7 @@ function AccountList() {
 
             <label>
               Nome:
-              <input type="text" name="name" placeholder="Nome" onChange={handleChange}/>
+              <input type="text" name="name" placeholder="Nome" maxLength="30" onChange={handleChange}/>
             </label>
 
             <label>
@@ -98,6 +137,8 @@ function AccountList() {
                 <th>Tipo</th>
                 <th>Descrição</th>
                 <th>Status</th>
+                <th>Criação</th>
+                <th>Alteração</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -112,6 +153,8 @@ function AccountList() {
                   <td>{c.type}</td>
                   <td>{c.description}</td>
                   <td>{c.status}</td>
+                  <td>{c.createdBy.name}</td>
+                  <td>{c.updatedBy.name}</td>
                   <td
                     onClick={(e) => {
                       e.stopPropagation();

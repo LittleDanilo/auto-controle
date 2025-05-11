@@ -9,29 +9,46 @@ function TransactionList() {
   const navigate = useNavigate();
 
   const [contas, setContas] = useState({});
+  const [currentUser, setUser] = useState(null);
   
-  async function getAccounts(){
-    const accountsFromApi = await api.post('/accounts/list')
-    setContas(accountsFromApi.data.result)
+  async function getAccounts(id){
+    try {
+      const accountsFromApi = await api.post('/accounts/list', {userID: id})
+      if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
+      return alert(usersFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
   const [transacoes, setTrans] = useState({});
   
-  async function getTransactions(){
-    const transactionsFromApi = await api.post('/transactions/list')
-    setTrans(transactionsFromApi.data.result)
+  async function getTransactions(id){
+    try {
+      const transactionsFromApi = await api.post('/transactions/list', {userID: id})
+      if(transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result)
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
   useEffect(() =>{
-      getAccounts();
-      getTransactions();
-    }, [])
+    const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
+      if (!storedUser) {
+        return navigate('/');
+      }
+    setUser(storedUser);
+    getAccounts(storedUser.id);
+    getTransactions(storedUser.id);
+  }, [])
+
 
   const [form, setForm] = useState({
-      name: "",
-      type: "",
-      status: ""
-    });
+    name: "",
+    type: "",
+    status: ""
+  });
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,7 +59,7 @@ function TransactionList() {
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-    const transactionsFromApi = await api.post('/transactions/list', inputs);
+    const transactionsFromApi = await api.post('/transactions/list', {userID: currentUser.id, ...inputs});
 
     if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
     alert("Erro ao buscar transacoes.");
@@ -65,10 +82,11 @@ function TransactionList() {
     }
     alert("Erro ao retomar conta.");
   }
-  
+
+  if (!currentUser) return <p>Carregando ...</p>;
   return (
     <div className='container'>
-      <Menu />
+      <Menu user={currentUser}/>
         
           <form className='container'>
           <h1>Listar de Transacoes</h1>
