@@ -11,16 +11,6 @@ function AccountList() {
   const [contas, setContas] = useState({});
   const [currentUser, setUser] = useState(null);
 
-  async function getAccounts(id){
-    try {
-      const accountsFromApi = await api.post('/accounts/list', {userID: id})
-      if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
-      return alert(usersFromApi.data.error);
-    } catch (e) {
-      return alert(e.message);
-    }
-  }
-
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -32,16 +22,15 @@ function AccountList() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  async function searchAccounts(){
+  async function searchAccounts(id){
     
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-
     try {
       const accountsFromApi = await api.post('/accounts/list', {
-        userID: currentUser.id,
-        data: inputs
+        userID: id,
+        data: inputs || {}
       })
 
       if (accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result);
@@ -60,7 +49,7 @@ function AccountList() {
       });
 
       if (accountsFromApi.data.status == 200) {
-        searchAccounts();
+        searchAccounts(currentUser.id);
         return alert("Conta suspensa com sucesso!");
       }
 
@@ -78,7 +67,7 @@ function AccountList() {
       });
       
       if (accountsFromApi.data.status == 200) {
-        searchAccounts();
+        searchAccounts(currentUser.id);
         return alert("Conta ativada com sucesso!");
       }
 
@@ -94,9 +83,9 @@ function AccountList() {
         return navigate('/');
       }
     setUser(storedUser);
-    getAccounts(storedUser.id)
+    searchAccounts(storedUser.id);
   }, [])
-  
+
   if (!currentUser) return <p>Carregando ...</p>;
     return (
       <div className='container'>
@@ -127,7 +116,7 @@ function AccountList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchAccounts}>Filtrar</button>
+            <button type="button" onClick={searchAccounts(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>

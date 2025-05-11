@@ -11,16 +11,6 @@ function UserList() {
   const [usuarios, setListaUsuarios] = useState({});
   const [currentUser, setUser] = useState(null);
 
-  async function getUsers(id){
-    try {
-      const accountsFromApi = await api.post('/users/list', {userID: id})
-      if(accountsFromApi.data.status == 200) return setListaUsuarios(accountsFromApi.data.result)
-      return alert(usersFromApi.data.error);
-    } catch (e) {
-      return alert(e.message);
-    }
-  }
-
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -32,17 +22,17 @@ function UserList() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  async function searchUsers(){
+  async function searchUsers(id){
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
 
     try {
-      const usersFromApi = await api.post('/accounts/list', {
-        userID: currentUser.id,
+      const usersFromApi = await api.post('/users/list', {
+        userID: id,
         data: inputs
       })
-      console.log(usersFromApi.data.result);
+
       if  (usersFromApi.data.status == 200) return setListaUsuarios(usersFromApi.data.result);
       return alert (usersFromApi.data.error);
 
@@ -59,7 +49,7 @@ function UserList() {
       });
 
       if (usersFromApi.data.status == 200) {
-        searchUsers();
+        searchUsers(currentUser.id);
         return alert("Usuario excluido com sucesso!");
       }
       return alert(usersFromApi.data.error);
@@ -77,7 +67,7 @@ function UserList() {
       });
 
       if (usersFromApi.data.status == 200) {
-        searchUsers();
+        searchUsers(currentUser.id);
         return alert("Usuario ativado com sucesso!");
       }
       return alert(usersFromApi.data.error);
@@ -93,7 +83,7 @@ function UserList() {
         return navigate('/');
       }
     setUser(storedUser);
-    getUsers(storedUser.id)
+    searchUsers(storedUser.id)
   }, [])
   
   if (!currentUser) return <p>Carregando ...</p>;
@@ -105,12 +95,12 @@ function UserList() {
         
             <label>
               Nome:
-              <input type="text" name="name" placeholder="Nome" onChange={handleChange}/>
+              <input type="text" name="name" placeholder="Nome" maxLength={30} onChange={handleChange}/>
             </label>
 
             <label>
                 Email:
-                <input type="email" name="email" placeholder="Email" onChange={handleChange}/>
+                <input type="email" name="email" placeholder="Email" maxLength={30} onChange={handleChange}/>
             </label>
 
             <label>
@@ -123,7 +113,7 @@ function UserList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchUsers}>Filtrar</button>
+            <button type="button" onClick={searchUsers(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>

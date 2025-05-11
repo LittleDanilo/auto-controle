@@ -2,6 +2,7 @@ import Menu from '../../components/Menu'
 import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'
+import { validarData } from '../../utils/validarData';
 
 function Transaction() {
 
@@ -33,7 +34,7 @@ function Transaction() {
     try {
       const accountsFromApi = await api.post('/accounts/list', {userID: id})
       if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
-      return alert(usersFromApi.data.error);
+      return alert(accountsFromApi.data.error);
     } catch (e) {
       return alert(e.message);
     }
@@ -90,34 +91,55 @@ function Transaction() {
   async function newTransaction(){
     if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
     if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
+    if (form.value < 0) return alert("Informe um valor positivo")
+    if (!validarData(form.date).valido) return alert(resultado.erro) 
+
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-    
-    const accountsFromApi = await api.post('/transactions/create', inputs)
-    if (accountsFromApi.data.status == 200) return alert("Transacao registrada com sucesso!");
-    alert("Erro ao registrar transacao."); 
+
+    try {
+      const transactionsFromApi = await api.post('/transactions/register', {userID: currentUser.id, data: inputs});
+      if (transactionsFromApi.data.status == 200) {
+        setForm({origin: '',destiny: '',value: '',date: '',description: '',status: 'Concluida'})
+        return alert("Transacao registrada com sucesso!");
+      }
+      return alert(transactionsFromApi.data.error); 
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
   async function updateTransaction(){
 
     if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
-    if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("As contas de origem e destino nao podem ser iguais.");
-    const accountsFromApi = await api.post('/transactions/update', {
-      id: transacaoRecebida.id,
-      fields: form
-    })
-    if (accountsFromApi.data.status == 200) {
-      const TransacaoAtualizada = { id: transacaoAtual.id, ...form };
-      setTransacaoAtual(TransacaoAtualizada);
+    if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
+    if (form.value < 0) return alert("Informe um valor positivo")
+    if (!validarData(form.date).valido) return alert(resultado.erro)
 
-      setDesabilitado(true);
-      setSalvarHabilitado(false);
-      setEditarHabilitado(true);
-      setCancelarHabilitado(false);
-      return alert("Transacao editada com sucesso!");
-    }
-    alert("Erro ao editar transacao."); 
+    try {
+      const accountsFromApi = await api.post('/transactions/update', {
+        userID: currentUser.id,
+        data: {
+          id: transacaoRecebida.id,
+          fields: form
+        }
+      })
+  
+      if (accountsFromApi.data.status == 200) {
+        const TransacaoAtualizada = { id: transacaoAtual.id, ...form };
+        setTransacaoAtual(TransacaoAtualizada);
+        setDesabilitado(true);
+        setSalvarHabilitado(false);
+        setEditarHabilitado(true);
+        setCancelarHabilitado(false);
+        return alert("Transacao editada com sucesso!");
+      }
+      
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    } 
   }
 
   if (!currentUser) return <p>Carregando ...</p>;
@@ -152,7 +174,9 @@ function Transaction() {
 
         <label>
           Valor:
-          <input type="number" name="value" placeholder="Valor" value={form.value} onChange={handleChange} disabled={desabilitado}/>
+          <input 
+            type="number" name="value" placeholder="Valor" maxLength={30} step="0.01"
+            value={form.value} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
         <label>
@@ -161,8 +185,10 @@ function Transaction() {
         </label>
 
         <label>Descricao:</label>
-          <textarea name="description" rows="4" cols="50" value={form.description} onChange={handleChange} disabled={desabilitado}></textarea>
-        
+          <textarea 
+            name="description" rows="4" cols="50" maxLength={30}
+            value={form.description} onChange={handleChange} disabled={desabilitado}>        
+          </textarea>
         <label>
           Status:
           <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>

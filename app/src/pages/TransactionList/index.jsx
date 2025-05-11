@@ -22,16 +22,6 @@ function TransactionList() {
   }
 
   const [transacoes, setTrans] = useState({});
-  
-  async function getTransactions(id){
-    try {
-      const transactionsFromApi = await api.post('/transactions/list', {userID: id})
-      if(transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result)
-      return alert(transactionsFromApi.data.error);
-    } catch (e) {
-      return alert(e.message);
-    }
-  }
 
   useEffect(() =>{
     const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
@@ -40,7 +30,7 @@ function TransactionList() {
       }
     setUser(storedUser);
     getAccounts(storedUser.id);
-    getTransactions(storedUser.id);
+    searchTransactions(storedUser.id);
   }, [])
 
 
@@ -55,32 +45,46 @@ function TransactionList() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  async function searchTransactions(){
+  async function searchTransactions(id){
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-    const transactionsFromApi = await api.post('/transactions/list', {userID: currentUser.id, ...inputs});
+    try {
+      const transactionsFromApi = await api.post('/transactions/list', {userID: id, ...inputs});
 
-    if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
-    alert("Erro ao buscar transacoes.");
+      if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
+
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
+    
   }
 
   async function cancelTransaction(id){
-    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Cancelada"}});
-    if (transactionsFromApi.data.status == 200) {
-      searchTransactions();
-      return alert("Transacao cancelada com sucesso!");
+    try {
+      const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Cancelada"}});
+      if (transactionsFromApi.data.status == 200) {
+        searchTransactions(currentUser.id);
+        return alert("Transacao cancelada com sucesso!");
+      }
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
     }
-    alert("Erro ao cancelar transacao.");
   }
 
   async function reactivateTransaction(id){
-    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Concluida"}});
-    if (transactionsFromApi.data.status == 200) {
-      searchTransactions();
-      return alert("Transacao retomada com sucesso!");
+    try {
+      const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Concluida"}});
+      if (transactionsFromApi.data.status == 200) {
+        searchTransactions(currentUser.id);
+        return alert("Transacao retomada com sucesso!");
+      }
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
     }
-    alert("Erro ao retomar conta.");
   }
 
   if (!currentUser) return <p>Carregando ...</p>;
@@ -116,7 +120,7 @@ function TransactionList() {
 
             <label>
               Valor:
-              <input type="number" name="value" placeholder="Valor" onChange={handleChange}/>
+              <input type="number" name="value" placeholder="Valor" maxLength={20} step="0.01" onChange={handleChange}/>
             </label>
 
             <label>
@@ -134,7 +138,7 @@ function TransactionList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchTransactions}>Filtrar</button>
+            <button type="button" onClick={searchTransactions(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>
@@ -146,6 +150,8 @@ function TransactionList() {
                 <th>Valor</th>
                 <th>Descrição</th>
                 <th>Status</th>
+                <th>Criação</th>
+                <th>Alteração</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -166,6 +172,8 @@ function TransactionList() {
                     <td className='valor'>R$ {parseFloat(t.value).toFixed(2)}</td>
                     <td>{t.description}</td>
                     <td>{t.status}</td>
+                    <td>{t.createdBy.name}</td>
+                    <td>{t.updatedBy.name}</td>
                     <td
                       onClick={(e) => {
                         e.stopPropagation();
