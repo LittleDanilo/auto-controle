@@ -9,7 +9,8 @@ class RegisterService {
             const user = await User.create({
                 name: name,
                 email: email,
-                password : password
+                password : password,
+                status: "Ativo"
             });
             return user;
         } catch (err) {
