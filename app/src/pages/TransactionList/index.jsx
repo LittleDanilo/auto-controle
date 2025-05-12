@@ -8,7 +8,7 @@ function TransactionList() {
 
   const navigate = useNavigate();
 
-  const [contas, setContas] = useState({});
+  const [contas, setContas] = useState([]);
   const [currentUser, setUser] = useState(null);
   
   async function getAccounts(id){
@@ -50,7 +50,7 @@ function TransactionList() {
       Object.entries(form).filter(([_, v]) => v !== '')
     );
     try {
-      const transactionsFromApi = await api.post('/transactions/list', {userID: id, ...inputs});
+      const transactionsFromApi = await api.post('/transactions/list', {userID: id, data: {...inputs}});
 
       if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
 
@@ -63,7 +63,10 @@ function TransactionList() {
 
   async function cancelTransaction(id){
     try {
-      const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Cancelada"}});
+      const transactionsFromApi = await api.post('/transactions/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Cancelada"}}
+      });
       if (transactionsFromApi.data.status == 200) {
         searchTransactions(currentUser.id);
         return alert("Transacao cancelada com sucesso!");
@@ -76,7 +79,10 @@ function TransactionList() {
 
   async function reactivateTransaction(id){
     try {
-      const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Concluida"}});
+      const transactionsFromApi = await api.post('/transactions/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Concluida"}}
+      });
       if (transactionsFromApi.data.status == 200) {
         searchTransactions(currentUser.id);
         return alert("Transacao retomada com sucesso!");
@@ -138,7 +144,7 @@ function TransactionList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchTransactions(currentUser.id)}>Filtrar</button>
+            <button type="button" onClick={() =>searchTransactions(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>

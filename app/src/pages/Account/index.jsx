@@ -49,6 +49,7 @@ function Account() {
         type: "Interna",
         description: "",
       })
+      return setDesabilitado(isEdicao)
     }, [contaRecebida]);
     
   

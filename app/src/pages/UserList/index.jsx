@@ -113,7 +113,7 @@ function UserList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchUsers(currentUser.id)}>Filtrar</button>
+            <button type="button" onClick={() =>searchUsers(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>

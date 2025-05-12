@@ -66,6 +66,7 @@ function Transaction() {
         description: '',
         status: 'Concluida',
       })
+      return setDesabilitado(isEdicao)
     }, [transacaoRecebida]);
 
   const handleChange = (e) => {
@@ -89,10 +90,12 @@ function Transaction() {
   };
 
   async function newTransaction(){
-    if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
+    const resultado = validarData(form.date)
+    if (!resultado.valido) return alert(resultado.erro) 
+    if (form.value == '' || form.date == '' || form.origin == "" || form.destiny == "") return alert("Preencha todos os campos.")
     if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
     if (form.value < 0) return alert("Informe um valor positivo")
-    if (!validarData(form.date).valido) return alert(resultado.erro) 
+     
 
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
@@ -111,12 +114,14 @@ function Transaction() {
   }
 
   async function updateTransaction(){
+    
+    const resultado = validarData(form.date)
+    if (!resultado.valido) return alert(resultado.erro) 
 
-    if (form.value == '' || form.date == '') return alert("Preencha todos os campos.")
+    if (form.value == '' || form.date == '' || form.origin == "" || form.destiny == "") return alert("Preencha todos os campos.")
     if (form.origin == form.destiny || !form.origin || !form.destiny) return alert("Informe contas validas e diferentes.");
     if (form.value < 0) return alert("Informe um valor positivo")
-    if (!validarData(form.date).valido) return alert(resultado.erro)
-
+    
     try {
       const accountsFromApi = await api.post('/transactions/update', {
         userID: currentUser.id,

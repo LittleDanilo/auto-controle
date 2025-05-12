@@ -116,7 +116,7 @@ function AccountList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchAccounts(currentUser.id)}>Filtrar</button>
+            <button type="button" onClick={() =>searchAccounts(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>

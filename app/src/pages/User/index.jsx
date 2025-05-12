@@ -48,6 +48,7 @@ function User() {
         email: "",
         password: "",
       })
+      return setDesabilitado(isEdicao)
     }, [usuarioRecebido]);
     
   
