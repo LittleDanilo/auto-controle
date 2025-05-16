@@ -6,7 +6,6 @@ class UpdateAccountService {
             const account = await Accounts.update(fields, {where: {id: id}});
             return account;
         } catch (err) {
-            console.log(err);
             throw new Error(err.message || "Internal error.");
         }
     }

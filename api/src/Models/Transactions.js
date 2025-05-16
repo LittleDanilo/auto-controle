@@ -1,16 +1,13 @@
-const {db} = require('./db');
+const db = require('./db');
 const { DataTypes } = require('sequelize');
 const Accounts = require('./Accounts');
-const Users = require('./Users')
+const Users = require('./Users');
 
 const Transactions = db.define('Transactions', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
-    },
-    createBy: {
-        type: DataTypes.INTEGER
     },
     origin: {
         type: DataTypes.INTEGER
@@ -22,7 +19,7 @@ const Transactions = db.define('Transactions', {
         type: DataTypes.DECIMAL(15,2)
     },
     date: {
-        type: DataTypes.DATE
+        type: DataTypes.DATEONLY
     },
     description: {
         type: DataTypes.TEXT,
@@ -36,6 +33,7 @@ const Transactions = db.define('Transactions', {
 })
 
 Transactions.belongsTo(Users, { foreignKey: 'createdBy', as: 'UserCreator' });
+Transactions.belongsTo(Users, { foreignKey: 'updatedBy', as: 'UserUpdater' });
 Transactions.belongsTo(Accounts, { foreignKey: 'origin', as: 'OriginAccount' });
 Transactions.belongsTo(Accounts, { foreignKey: 'destiny', as: 'DestinyAccount' });
 

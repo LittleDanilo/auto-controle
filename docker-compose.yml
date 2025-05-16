@@ -15,11 +15,12 @@ services:
   api:
     build: ./api
     container_name: auto-controle-api
+    env_file: .env
     ports:
       - "5000:5000"
-#    volumes:
-#      - "./api:/usr/auto-controle/api"
-#      - "./api/node_modules:/usr/auto-controle/api/node_modules"
+    volumes:
+      - "./api:/usr/auto-controle/api:cached"
+      - "/usr/auto-controle/api/node_modules"
     restart: always
     networks:
       - auto-controle-network
@@ -28,11 +29,12 @@ services:
   app:
     build: ./app
     container_name: auto-controle-app
+    env_file: .env
     ports:
       - "5173:5173"
-#    volumes:
-#      - "./app:/usr/auto-controle/app"
-#      - "/usr/auto-controle/app/node_modules"
+    volumes:
+      - "./app:/usr/auto-controle/app:cached"
+      - "/usr/auto-controle/app/node_modules"
     command: npm run dev -- --host
     restart: always
     networks:

@@ -3,26 +3,25 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api'
 
-function Account() {
+function User() {
 
   const navigate = useNavigate();
 
   const [currentUser, setUser] = useState(null);
 
   const location = useLocation();
-  const { contaRecebida } = location.state || {};
-  const [contaAtual, setContaAtual] = useState(contaRecebida);
+  const { usuarioRecebido } = location.state || {};
+  const [usuarioAtual, setUsuarioAtual] = useState(usuarioRecebido);
     
-    const [desabilitado, setDesabilitado] = useState(!!contaRecebida);
+    const [desabilitado, setDesabilitado] = useState(!!usuarioRecebido);
     const [salvarHabilitado, setSalvarHabilitado] = useState(false);
-    const [editarHabilitado, setEditarHabilitado] = useState(!!contaRecebida);
+    const [editarHabilitado, setEditarHabilitado] = useState(!!usuarioRecebido);
     const [cancelarHabilitado, setCancelarHabilitado] = useState(false);
   
     const valorOriginal = {
-      name: contaAtual?.name || '',
-      type: contaAtual?.type || 'Interna',
-      description: contaAtual?.description || '',
-      status: contaAtual?.status || 'Ativa',
+      name: usuarioAtual?.name || '',
+      email: usuarioAtual?.email || 'Interna',
+      password: usuarioAtual?.password || '',
     };
   
     const [form, setForm] = useState({ ...valorOriginal });
@@ -36,21 +35,21 @@ function Account() {
     }, []);
   
     useEffect(() => {
-      if (!contaRecebida) {
+      if (!usuarioRecebido) {
         setForm({ ...valorOriginal });
       }
     }, [location.state]);
 
     useEffect(() => {
-      const isEdicao = !!contaRecebida;
+      const isEdicao = !!usuarioRecebido;
       if (isEdicao) return setDesabilitado(isEdicao);
       setForm({
         name: "",
-        type: "Interna",
-        description: "",
+        email: "",
+        password: "",
       })
       return setDesabilitado(isEdicao)
-    }, [contaRecebida]);
+    }, [usuarioRecebido]);
     
   
     const handleChange = (e) => {
@@ -73,34 +72,38 @@ function Account() {
       setCancelarHabilitado(false);
     };
 
-    async function createAccount(){
+    async function createUser(){
 
-      if (form.name == '') return alert("O nome deve ser preenchido")
-      const inputs = Object.fromEntries(
-        Object.entries(form).filter(([_, v]) => v !== '')
-      );
+      if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
+      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+      if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
 
       try {
-        const accountsFromApi = await api.post('/accounts/register', {
+        const usersFromApi = await api.post('/users/register', {
           userID: currentUser.id,
-          data: inputs
+          data: form
         })
 
-        if (accountsFromApi.data.status == 200) {
-          setForm({name: "",type: "Interna",description: ""}) // Limpa o formulario
-          return alert("Conta criada com sucesso!");
+        if (usersFromApi.data.status == 200) {
+          setForm({name: "",email: "",password: ""}) // Limpa o formulario
+          return alert("Usuario criado com sucesso!");
         }
-        return alert(accountsFromApi.data.error);
+        return alert(usersFromApi.data.error);
       } catch (e) {
         return alert(e.message); 
       }  
     }
 
-    async function updateAccount(){
+    async function updateUser(){
 
-      if (form.name == '') return alert("O nome deve ser preenchido")
+      if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
+      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+      if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
+
       try {
-        const accountsFromApi = await api.post('/accounts/update', {
+        const accountsFromApi = await api.post('/users/update', {
           userID: currentUser.id,
           data: {id: contaRecebida.id, fields: form}
         })
@@ -112,21 +115,20 @@ function Account() {
           setSalvarHabilitado(false);
           setEditarHabilitado(true);
           setCancelarHabilitado(false);
-          return alert("Conta alterada com sucesso!");
+          return alert("Usuario alterado com sucesso!");
         }
           return alert(accountsFromApi.data.error);
       } catch (e) {
         return alert(e.message); 
-      }
+      } 
     }
-
     
   if (!currentUser) return <p>Carregando ...</p>;
   return (
     <div className='container'>
       <Menu user={currentUser}/>
       <form>
-      {!contaRecebida ? (<h1>Nova Conta</h1>) : (<h1>Editar Conta</h1>)}
+      {!usuarioRecebido ? (<h1>Novo Usuario</h1>) : (<h1>Editar Usuario</h1>)}
       
         <label>
           Nome:
@@ -136,48 +138,40 @@ function Account() {
         </label>
 
         <label>
-          Tipo:
-          <select name="type" value={form.type} onChange={handleChange} disabled={desabilitado}>
-            <option value="Interna">Interna</option>
-            <option value="Externa">Externa</option>
-          </select>
+          Email:
+          <input 
+            type="email" name="email" placeholder="Email" maxLength="30"
+            value={form.email} onChange={handleChange} disabled={desabilitado}/>
         </label>
 
-        <label>Descricao:</label>
-        <textarea name="description" rows="4" cols="50" maxLength="200"
-          value={form.description} onChange={handleChange} disabled={desabilitado}>
-        </textarea>
+        <label>
+          Senha:
+          <input 
+            type="password" name="password" placeholder="Senha" maxLength="30"
+            value={form.password} onChange={handleChange} disabled={desabilitado}/>
+        </label>
 
           
-          {!contaRecebida ? (
+          {!usuarioRecebido ? (
             <p>
-              <button type="button" onClick={createAccount}>Criar</button>
+              <button type="button" onClick={createUser}>Criar</button>
             </p>
           ) : (
-            <>
-            <label>
-              Status:
-              <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>
-                <option value="Ativa">Ativa</option>
-                <option value="Inativa">Inativa</option>
-                <option value="Suspensa">Suspensa</option>
-              </select>
-            </label>
             <p>
               <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>
                 Editar
               </button>
-              <button type="button" onClick={updateAccount} disabled={!salvarHabilitado}>
+              <button type="button" onClick={updateUser} disabled={!salvarHabilitado}>
                 Salvar
               </button>
               <button type="button" onClick={handleCancelar} disabled={!cancelarHabilitado}>
                 Cancelar
               </button>
-            </p></>
+            </p>
           )}
       </form>
     </div>
   )
 }
 
-export default Account
+export default User

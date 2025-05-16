@@ -8,67 +8,95 @@ function TransactionList() {
 
   const navigate = useNavigate();
 
-  const [contas, setContas] = useState({});
+  const [contas, setContas] = useState([]);
+  const [currentUser, setUser] = useState(null);
   
-  async function getAccounts(){
-    const accountsFromApi = await api.post('/accounts/list')
-    setContas(accountsFromApi.data.result)
+  async function getAccounts(id){
+    try {
+      const accountsFromApi = await api.post('/accounts/list', {userID: id})
+      if(accountsFromApi.data.status == 200) return setContas(accountsFromApi.data.result)
+      return alert(usersFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
   }
 
   const [transacoes, setTrans] = useState({});
-  
-  async function getTransactions(){
-    const transactionsFromApi = await api.post('/transactions/list')
-    setTrans(transactionsFromApi.data.result)
-  }
 
   useEffect(() =>{
-      getAccounts();
-      getTransactions();
-    }, [])
+    const storedUser = JSON.parse(sessionStorage.getItem("acesso"));
+      if (!storedUser) {
+        return navigate('/');
+      }
+    setUser(storedUser);
+    getAccounts(storedUser.id);
+    searchTransactions(storedUser.id);
+  }, [])
+
 
   const [form, setForm] = useState({
-      name: "",
-      type: "",
-      status: ""
-    });
+    name: "",
+    type: "",
+    status: ""
+  });
   
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  async function searchTransactions(){
+  async function searchTransactions(id){
     const inputs = Object.fromEntries(
       Object.entries(form).filter(([_, v]) => v !== '')
     );
-    const transactionsFromApi = await api.post('/transactions/list', inputs);
+    try {
+      const transactionsFromApi = await api.post('/transactions/list', {userID: id, data: {...inputs}});
 
-    if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
-    alert("Erro ao buscar transacoes.");
+      if (transactionsFromApi.data.status == 200) return setTrans(transactionsFromApi.data.result);
+
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
+    }
+    
   }
 
   async function cancelTransaction(id){
-    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Cancelada"}});
-    if (transactionsFromApi.data.status == 200) {
-      searchTransactions();
-      return alert("Transacao cancelada com sucesso!");
+    try {
+      const transactionsFromApi = await api.post('/transactions/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Cancelada"}}
+      });
+      if (transactionsFromApi.data.status == 200) {
+        searchTransactions(currentUser.id);
+        return alert("Transacao cancelada com sucesso!");
+      }
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
     }
-    alert("Erro ao cancelar transacao.");
   }
 
   async function reactivateTransaction(id){
-    const transactionsFromApi = await api.post('/transactions/update', {id: id, fields: {status: "Concluida"}});
-    if (transactionsFromApi.data.status == 200) {
-      searchTransactions();
-      return alert("Transacao retomada com sucesso!");
+    try {
+      const transactionsFromApi = await api.post('/transactions/update', {
+        userID: currentUser.id,
+        data: {id: id, fields: {status: "Concluida"}}
+      });
+      if (transactionsFromApi.data.status == 200) {
+        searchTransactions(currentUser.id);
+        return alert("Transacao retomada com sucesso!");
+      }
+      return alert(transactionsFromApi.data.error);
+    } catch (e) {
+      return alert(e.message);
     }
-    alert("Erro ao retomar conta.");
   }
-  
+
+  if (!currentUser) return <p>Carregando ...</p>;
   return (
     <div className='container'>
-      <Menu />
+      <Menu user={currentUser}/>
         
           <form className='container'>
           <h1>Listar de Transacoes</h1>
@@ -98,7 +126,7 @@ function TransactionList() {
 
             <label>
               Valor:
-              <input type="number" name="value" placeholder="Valor" onChange={handleChange}/>
+              <input type="number" name="value" placeholder="Valor" maxLength={20} step="0.01" onChange={handleChange}/>
             </label>
 
             <label>
@@ -116,7 +144,7 @@ function TransactionList() {
               </select>
             </label>
 
-            <button type="button" onClick={searchTransactions}>Filtrar</button>
+            <button type="button" onClick={() =>searchTransactions(currentUser.id)}>Filtrar</button>
           </form>
 
           <table>
@@ -128,6 +156,8 @@ function TransactionList() {
                 <th>Valor</th>
                 <th>Descrição</th>
                 <th>Status</th>
+                <th>Criação</th>
+                <th>Alteração</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -142,12 +172,14 @@ function TransactionList() {
                     onClick={() => navigate('/transacoes', { state: { transacaoRecebida: t } })}
                     style={{ cursor: 'pointer' }}
                   >
-                    <td>{new Date(t.date).toLocaleDateString()}</td>
+                    <td>{t.date.slice(0, 10).split('-').reverse().join('/')}</td>
                     <td>{contaOrigem?.name || 'Origem não encontrada'}</td>
                     <td>{contaDestino?.name || 'Destino não encontrado'}</td>
                     <td className='valor'>R$ {parseFloat(t.value).toFixed(2)}</td>
                     <td>{t.description}</td>
                     <td>{t.status}</td>
+                    <td>{t.createdBy.name}</td>
+                    <td>{t.updatedBy.name}</td>
                     <td
                       onClick={(e) => {
                         e.stopPropagation();
