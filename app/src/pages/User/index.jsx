@@ -103,21 +103,21 @@ function User() {
       if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
 
       try {
-        const accountsFromApi = await api.post('/users/update', {
+        const usersFromApi = await api.post('/users/update', {
           userID: currentUser.id,
-          data: {id: contaRecebida.id, fields: form}
+          data: {id: usuarioRecebido.id, fields: form}
         })
 
-        if (accountsFromApi.data.status == 200) {
-          const contaAtualizada = { id: contaAtual.id, ...form };
-          setContaAtual(contaAtualizada);
+        if (usersFromApi.data.status == 200) {
+          const usuarioAtualizado = { id: usuarioAtual.id, ...form };
+          setUsuarioAtual(usuarioAtualizado);
           setDesabilitado(true);
           setSalvarHabilitado(false);
           setEditarHabilitado(true);
           setCancelarHabilitado(false);
           return alert("Usuario alterado com sucesso!");
         }
-          return alert(accountsFromApi.data.error);
+          return alert(usersFromApi.data.error);
       } catch (e) {
         return alert(e.message); 
       } 
