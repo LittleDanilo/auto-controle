@@ -6,16 +6,16 @@ export default function Menu({user}) {
   return (
     <>
       <div className='usuario'>
-        Usuario: {user.name}
+        Usuário: {user.name}
       </div>
       <nav>
         <ul>
-          <li><Link to="/lista-transacoes">Listar Transacoes</Link></li>
-          <li><Link to="/transacoes">Nova Transacao</Link></li>
-          <li><Link to="/lista-contas">Listar Contas</Link></li>
+          <li><Link to="/lista-transacoes">Lista de Transações</Link></li>
+          <li><Link to="/transacoes">Nova Transação</Link></li>
+          <li><Link to="/lista-contas">Lista de Contas</Link></li>
           <li><Link to="/contas">Nova Conta</Link></li>
-          <li><Link to="/lista-usuarios">Listar Usuarios</Link></li>
-          <li><Link to="/usuarios">Novo Usuario</Link></li>
+          <li><Link to="/lista-usuarios">Lista de Usuários</Link></li>
+          <li><Link to="/usuarios">Novo Usuário</Link></li>
           <li><Link to="/" onClick={() => sessionStorage.removeItem("acesso")}>Sair</Link></li>
         </ul>
       </nav>

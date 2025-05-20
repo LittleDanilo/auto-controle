@@ -91,7 +91,7 @@ function UserList() {
       <div className='container'>
         <Menu user={currentUser}/>
           <form className='container'>
-          <h1>Listar de Usuarios</h1>
+          <h1>Lista de Usuários</h1>
         
             <label>
               Nome:

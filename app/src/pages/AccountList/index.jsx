@@ -91,7 +91,7 @@ function AccountList() {
       <div className='container'>
         <Menu user={currentUser}/>
           <form className='container'>
-          <h1>Listar de Contas</h1>
+          <h1>Lista de Contas</h1>
             <label>
               Tipo:
               <select name="type" onChange={handleChange}>

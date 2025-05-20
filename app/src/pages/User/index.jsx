@@ -128,7 +128,7 @@ function User() {
     <div className='container'>
       <Menu user={currentUser}/>
       <form>
-      {!usuarioRecebido ? (<h1>Novo Usuario</h1>) : (<h1>Editar Usuario</h1>)}
+      {!usuarioRecebido ? (<h1>Novo Usuário</h1>) : (<h1>Editar Usuário</h1>)}
       
         <label>
           Nome:
@@ -157,17 +157,27 @@ function User() {
               <button type="button" onClick={createUser}>Criar</button>
             </p>
           ) : (
-            <p>
-              <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>
-                Editar
-              </button>
-              <button type="button" onClick={updateUser} disabled={!salvarHabilitado}>
-                Salvar
-              </button>
-              <button type="button" onClick={handleCancelar} disabled={!cancelarHabilitado}>
-                Cancelar
-              </button>
-            </p>
+            <>
+              <label>
+                Status:
+                <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>
+                  <option value="Ativo">Ativo</option>
+                  <option value="Desativado">Desativado</option>
+                  <option value="Excluido">Excluido</option>
+                </select>
+              </label>
+              <p>
+                <button type="button" onClick={handleEditar} disabled={!editarHabilitado}>
+                  Editar
+                </button>
+                <button type="button" onClick={updateUser} disabled={!salvarHabilitado}>
+                  Salvar
+                </button>
+                <button type="button" onClick={handleCancelar} disabled={!cancelarHabilitado}>
+                  Cancelar
+                </button>
+              </p>
+            </>
           )}
       </form>
     </div>
