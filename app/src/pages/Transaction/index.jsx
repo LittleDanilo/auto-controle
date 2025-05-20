@@ -152,7 +152,7 @@ function Transaction() {
     <div className='container'>
       <Menu user={currentUser}/>
       <form>
-      {!transacaoRecebida ? (<h1>Nova Transacao</h1>) : (<h1>Editar Transacao</h1>)}
+      {!transacaoRecebida ? (<h1>Nova Transação</h1>) : (<h1>Editar Transação</h1>)}
         <label>
           Origem:
           <select name="origin" value={form.origin} onChange={handleChange} disabled={desabilitado}>
@@ -191,7 +191,7 @@ function Transaction() {
 
         <label>Descricao:</label>
           <textarea 
-            name="description" rows="4" cols="50" maxLength={30}
+            name="description" rows="4" cols="50" maxLength={300}
             value={form.description} onChange={handleChange} disabled={desabilitado}>        
           </textarea>
         <label>
@@ -199,7 +199,7 @@ function Transaction() {
           <select name="status" value={form.status} onChange={handleChange} disabled={desabilitado}>
             <option value="Concluida">Concluida</option>
             <option value="Pendente">Pendente</option>
-            <option value="Cancelada">Cancelada</option>
+            {transacaoRecebida && <option value="Cancelada">Cancelada</option>}
           </select>
         </label>
                   

@@ -75,10 +75,11 @@ form {
     }
 
   textarea {
-    width: '100%'; 
-    max-width: '500px';  
-    resize: 'vertical';
-    box-sizing: 'border-box';
+    width: 100%; 
+    max-width: 400px;
+    max-height: 200px;  
+    resize: vertical;
+    box-sizing: border-box;
   }
 }
 

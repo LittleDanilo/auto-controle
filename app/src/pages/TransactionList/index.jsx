@@ -99,7 +99,7 @@ function TransactionList() {
       <Menu user={currentUser}/>
         
           <form className='container'>
-          <h1>Listar de Transacoes</h1>
+          <h1>Lista de Transações</h1>
             <label>
               Origem:
               <select name="origin" onChange={handleChange}>
