@@ -1,7 +1,7 @@
 const Transacions = require('../../Models/Transactions');
 
 class RegisterTransactionsService {
-    static async register(userID, origin, destiny, value, date, description) {
+    static async register(userID, origin, destiny, value, date, description, status) {
         try {
             const transaction = await Transacions.create({
                 createdBy: userID,
@@ -9,6 +9,7 @@ class RegisterTransactionsService {
                 origin,
                 destiny,
                 description,
+                status,
                 value,
                 date
             });
