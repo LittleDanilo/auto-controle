@@ -2,7 +2,7 @@ const UpdateUsersService = require('../../Services/Users/UpdateUsersService');
 
 module.exports = async (req, res) => {
     try{
-        const {userID} = req.body;
+        const {userID} = req.body.userID;
         const {fields, id} = req.body.data;
         fields.updatedBy = userID;
         const user = await UpdateUsersService.execute({fields}, id);

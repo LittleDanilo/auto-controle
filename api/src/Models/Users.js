@@ -20,7 +20,10 @@ const Users = db.define('Users', {
     },
     password: {
         type: DataTypes.STRING,
-    }
+    },
 });
+
+Users.belongsTo(Users, { foreignKey: 'createdBy', as: 'UserCreator' });
+Users.belongsTo(Users, { foreignKey: 'updatedBy', as: 'UserUpdater' });
 
 module.exports = Users;

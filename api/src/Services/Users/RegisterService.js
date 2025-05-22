@@ -1,7 +1,7 @@
 const User = require('../../Models/Users');
 
 class RegisterService {
-    static async userRegister(name, email, password) {
+    static async userRegister(name, email, password, userID) {
         try {
             const test = await User.findOne({where: {email: email}});
             if (test) throw new Error('Usuário já existe.');
@@ -10,7 +10,9 @@ class RegisterService {
                 name: name,
                 email: email,
                 password : password,
-                status: "Ativo"
+                status: "Ativo",
+                createdBy: userID,
+                updatedBy: userID,
             });
             return user;
         } catch (err) {
