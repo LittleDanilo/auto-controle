@@ -9,5 +9,5 @@ module.exports = async (req, res) => {
         return res.status(200).json({status: 200, result: user});
     } catch (err) {
         return res.status(200).json({status: 500, error: err.message})
-    }
+    }   
 }

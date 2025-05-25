@@ -23,7 +23,7 @@ const Users = db.define('Users', {
     },
 });
 
-Users.belongsTo(Users, { foreignKey: 'createdBy', as: 'UserCreator' });
-Users.belongsTo(Users, { foreignKey: 'updatedBy', as: 'UserUpdater' });
+Users.belongsTo(Users, { foreignKey: 'createdBy', as: 'createdByUser'});
+Users.belongsTo(Users, { foreignKey: 'updatedBy', as: 'updatedByUser'});
 
 module.exports = Users;
