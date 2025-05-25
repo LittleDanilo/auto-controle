@@ -122,6 +122,8 @@ function UserList() {
                 <th>Nome</th>
                 <th>Email</th>
                 <th>Status</th>
+                <th>Criação</th>
+                <th>Alteração</th>
                 <th>Modificar</th>
               </tr>
             </thead>
@@ -135,6 +137,8 @@ function UserList() {
                   <td>{u.name}</td>
                   <td>{u.email}</td>
                   <td>{u.status}</td>
+                  <td>{u.createdBy.name}</td>
+                  <td>{u.updatedBy.name}</td>
                   <td
                     onClick={(e) => {
                       e.stopPropagation();
