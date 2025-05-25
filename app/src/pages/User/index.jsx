@@ -75,7 +75,7 @@ function User() {
     async function createUser(){
 
       if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
-      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      if (form.password.length < 6) return alert("Insira uma senha maior")
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
 
@@ -98,7 +98,7 @@ function User() {
     async function updateUser(){
 
       if (form.name == '' || form.email == '' || form.password == '') return alert("Preencha todos os campos")
-      if (form.password.lenght < 6) return alert("Insira uma senha maior")
+      if (form.password.length < 6) return alert("Insira uma senha maior")
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!regex.test(form.email)) return alert("Por favor, insira um e-mail válido.");
 
