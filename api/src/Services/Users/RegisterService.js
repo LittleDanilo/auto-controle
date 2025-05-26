@@ -5,7 +5,6 @@ class RegisterService {
         try {
             const test = await User.findOne({where: {email: email}});
             if (test) throw new Error('Usuário já existe.');
-
             const user = await User.create({
                 name: name,
                 email: email,

@@ -17,7 +17,9 @@ module.exports = async () => {
                     name: 'admin',
                     password: 'admin123',
                     email: 'admin@auto.controle',
-                    status: 'Ativo'
+                    status: 'Ativo',
+                    createdBy: 1,
+                    updatedBy: 1
                 });
             }
             console.log("\n=======Database Connected=======");

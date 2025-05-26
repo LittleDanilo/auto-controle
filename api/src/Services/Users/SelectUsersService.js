@@ -10,14 +10,14 @@ class SelectUsersService {
             const result = await Users.findAll({where});
             if (result.length == 0) return "Usuário não encontrado.";
             for (let i in result){
-                let user = await Users.findOne({id: result[i].createdBy});
+                let user = await Users.findOne({where: {id: result[i].createdBy}});
                 result[i].createdBy = {
                     id: user.id,
                     name: user.name,
                     email: user.email,
                 };
 
-                user = await Users.findOne({id: result[i].updatedBy});
+                user = await Users.findOne({where: {id: result[i].updatedBy}});
                 result[i].updatedBy = {
                     id: user.id,
                     name: user.name,
