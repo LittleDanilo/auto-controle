@@ -8,6 +8,6 @@ module.exports = async (req, res) => {
         const user = await UpdateUsersService.execute({fields}, id);
         return res.status(200).json({status: 200, result: user});
     } catch (err) {
-        return res.status(500).json({status: 500, error: err.message})
-    }
+        return res.status(200).json({status: 500, error: err.message})
+    }   
 }
