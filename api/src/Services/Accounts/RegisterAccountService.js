@@ -3,6 +3,8 @@ const Account = require('../../Models/Accounts');
 class RegisterAccountService {
     static async execute(userID, name, description, type) {
         try {
+            const accountExist = await Account.findOne({where: {name: name}});
+            if (accountExist) throw new Error("Já existe uma conta registrada com esse nome");
             const account = await Account.create({
                 createdBy: userID,
                 updatedBy: userID,
