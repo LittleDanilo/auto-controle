@@ -115,6 +115,11 @@ function User() {
           setSalvarHabilitado(false);
           setEditarHabilitado(true);
           setCancelarHabilitado(false);
+          if (currentUser.id == usuarioRecebido.id) {
+            const user = {id: currentUser.id, name: form.name, email: form.email };
+            sessionStorage.setItem("acesso", JSON.stringify(user));
+            setUser(user);
+          }
           return alert("Usuario alterado com sucesso!");
         }
           return alert(usersFromApi.data.error);
